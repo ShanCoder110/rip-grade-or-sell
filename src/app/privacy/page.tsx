@@ -7,14 +7,14 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 prose prose-sm dark:prose-invert">
+    <div className="page-narrow prose-page">
       <h1>Privacy Policy</h1>
       <p>
-        We collect account email via Supabase Auth, optional portfolio/watchlist data you store, and
-        analytics events when enabled. Payment data is processed by our billing provider; we do not
-        store full card numbers.
+        We collect account email through Supabase Auth, the watchlist and portfolio rows you save,
+        and analytics events only after you accept optional cookies. Payment details are handled by
+        the billing provider. We do not store full card numbers.
       </p>
-      <p>Contact: privacy@example.com (update before launch).</p>
+      <p>Contact: privacy@example.com (replace before launch).</p>
     </div>
   );
 }

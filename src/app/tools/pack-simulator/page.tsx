@@ -9,9 +9,12 @@ export const metadata: Metadata = {
 
 export default function PackSimulatorPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="text-3xl font-bold">Pack simulator</h1>
-      <PackSimulator />
+    <div className="page-narrow">
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">Free tool</p>
+      <h1 className="h1 mt-2">Pack simulator</h1>
+      <div className="mt-6">
+        <PackSimulator />
+      </div>
     </div>
   );
 }

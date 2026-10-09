@@ -34,6 +34,10 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+### Demo Pro checkout
+
+If Stripe keys are unset and `NODE_ENV` is not `production`, sign-in offers a **demo account** (no Supabase required). From `/pricing`, monthly or yearly checkout unlocks Pro in an httpOnly cookie for that browser. No card is charged. Set `STRIPE_SECRET_KEY`, `STRIPE_PRICE_MONTHLY`, and `STRIPE_PRICE_YEARLY` to use Stripe Checkout in test mode instead. The webhook is `POST /api/billing/webhook`.
+
 ## Scripts
 
 | Command | Description |

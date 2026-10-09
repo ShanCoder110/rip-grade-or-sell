@@ -7,11 +7,12 @@ export const metadata: Metadata = {
 
 export default function AffiliatePage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 prose prose-sm dark:prose-invert">
+    <div className="page-narrow prose-page">
       <h1>Affiliate Disclosure</h1>
       <p>
-        Some outbound links may be affiliate links (TCGplayer via Impact, eBay Partner Network). We
-        may earn a commission at no extra cost to you. Approval status varies — see launch checklist.
+        Some outbound links may be affiliate links, including TCGplayer via Impact and the eBay
+        Partner Network. We may earn a commission at no extra cost to you. Program approval is
+        tracked on the launch checklist.
       </p>
     </div>
   );

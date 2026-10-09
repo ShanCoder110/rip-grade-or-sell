@@ -26,6 +26,7 @@ const envSchema = z.object({
   STRIPE_SECRET_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
   STRIPE_PRICE_MONTHLY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
   STRIPE_PRICE_YEARLY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
+  DEMO_CHECKOUT: z.preprocess(emptyToUndefined, z.enum(["true", "false"]).optional()),
   POKEMONTCG_API_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
 });
 

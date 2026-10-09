@@ -13,17 +13,20 @@ export function CookieConsent() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card p-4 text-sm shadow-lg"
+      className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-3xl rounded-2xl border border-border bg-card p-4 shadow-lg sm:inset-x-auto sm:right-4 sm:left-auto"
       role="dialog"
       aria-label="Cookie consent"
     >
-      <p>
-        We use essential cookies for auth and optional analytics when configured. See{" "}
-        <a href="/privacy" className="underline">Privacy</a>.
+      <p className="text-sm leading-relaxed">
+        Essential cookies keep you signed in. Optional analytics stay off until you accept. See the{" "}
+        <a href="/privacy" className="link">
+          privacy policy
+        </a>
+        .
       </p>
       <button
         type="button"
-        className="mt-2 rounded-md bg-primary px-3 py-1 text-primary-foreground"
+        className="btn btn-primary mt-3"
         onClick={() => {
           localStorage.setItem("cookie-consent", "1");
           setVisible(false);

@@ -7,11 +7,12 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 prose prose-sm dark:prose-invert">
+    <div className="page-narrow prose-page">
       <h1>Terms of Service</h1>
       <p>
-        Rip, Grade or Sell provides informational tools only — not investment, tax, or legal advice.
-        Market prices and pull rates may be inaccurate or outdated.
+        Rip, Grade or Sell is an informational tool. It is not investment, tax, or legal advice.
+        Market prices and pull rates can be wrong or stale. You are responsible for decisions you
+        make with the numbers.
       </p>
     </div>
   );

@@ -6,14 +6,21 @@ export const metadata: Metadata = {
   alternates: { canonical: "/auth/login" },
 };
 
-export default function LoginPage() {
+type Props = { searchParams: Promise<{ next?: string }> };
+
+export default async function LoginPage({ searchParams }: Props) {
+  const { next } = await searchParams;
+  const nextPath = next?.startsWith("/") && !next.startsWith("//") ? next : "/pricing";
   return (
-    <div className="mx-auto max-w-md px-4 py-12">
-      <h1 className="text-2xl font-bold">Sign in</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Magic link email or Google (when OAuth is configured in Supabase).
+    <div className="page-narrow">
+      <h1 className="h1">Sign in</h1>
+      <p className="lede">
+        Sign in to subscribe to Pro. Magic link and Google need Supabase. Without it, use the demo
+        account to walk through checkout on this machine.
       </p>
-      <LoginForm className="mt-6" />
+      <div className="card mt-8 p-5 sm:p-6">
+        <LoginForm nextPath={nextPath} />
+      </div>
     </div>
   );
 }

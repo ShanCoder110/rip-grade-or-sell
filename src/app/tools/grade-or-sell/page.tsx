@@ -10,13 +10,14 @@ export const metadata: Metadata = {
 
 export default function GradeOrSellPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="text-3xl font-bold tracking-tight">Grade or sell</h1>
-      <p className="mt-2 text-muted-foreground">
-        Free calculator — share results via URL parameters. Prices and fees are your inputs;
-        grading odds are illustrative self-check mappings, not guarantees.
+    <div className="page-narrow">
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">Free tool</p>
+      <h1 className="h1 mt-2">Grade or sell</h1>
+      <p className="lede">
+        No account required. Share a result with the link. Grading odds are a self-check mapping,
+        not a promise of a gem mint.
       </p>
-      <Suspense fallback={<p className="mt-8 text-sm text-muted-foreground">Loading…</p>}>
+      <Suspense fallback={<div className="skeleton mt-8 h-80 w-full" aria-busy="true" />}>
         <GradeOrSellCalculator className="mt-8" />
       </Suspense>
     </div>

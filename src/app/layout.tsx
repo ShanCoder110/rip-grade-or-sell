@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { CookieConsent } from "@/components/cookie-consent";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { themeBootScript } from "@/components/theme-script";
 import { publicEnv } from "@/env.public";
 import "./globals.css";
 
@@ -33,11 +34,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
         <SiteHeader />
-        <main className="flex-1">{children}</main>
+        <main id="main" className="flex-1">
+          {children}
+        </main>
         <SiteFooter />
         <CookieConsent />
       </body>

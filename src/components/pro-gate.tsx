@@ -2,12 +2,13 @@ import Link from "next/link";
 
 export function ProGate({ feature }: { feature: string }) {
   return (
-    <div className="rounded-lg border border-border bg-muted/40 p-4 text-sm">
-      <p className="font-medium">{feature} is a Pro feature</p>
-      <p className="mt-1 text-muted-foreground">
-        Upgrade for unlimited watchlist, full EV history, alerts, and portfolio tools.
+    <div className="card mt-4 p-5">
+      <p className="font-semibold">{feature} is a Pro feature</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Pro unlocks an unlimited watchlist, full history, alerts, and portfolio tools. Cancel
+        anytime.
       </p>
-      <Link href="/pricing" className="mt-3 inline-block text-primary underline">
+      <Link href="/pricing" className="btn btn-primary mt-4">
         View pricing
       </Link>
     </div>

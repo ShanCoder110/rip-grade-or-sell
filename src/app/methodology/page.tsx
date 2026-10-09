@@ -8,24 +8,23 @@ export const metadata: Metadata = {
 
 export default function MethodologyPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12">
-      <h1 className="text-3xl font-bold tracking-tight">Methodology</h1>
-      <p className="mt-4 text-muted-foreground">
-        All currency values are stored and calculated in integer cents. Displayed amounts may
-        round to dollars for readability.
+    <div className="page-narrow prose-page">
+      <h1>Methodology</h1>
+      <p>
+        Currency is stored and calculated in integer cents. Dollar amounts on screen are rounded
+        only for reading.
       </p>
 
-      <section className="mt-10">
-        <h2 className="text-xl font-semibold">Sealed product expected value</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          For each rarity <em>r</em> with published odds (1 hit per <em>N</em> packs) and market
-          price <em>P<sub>r</sub></em> in cents:
-        </p>
-        <pre className="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm">
+      <h2>Sealed product expected value</h2>
+      <p>
+        For each rarity <em>r</em> with published odds (1 hit per <em>N</em> packs) and market price{" "}
+        <em>P</em> in cents:
+      </p>
+      <pre>
 {`hits_r = packCount × (1 / N_r)
 grossEV = round(Σ_r hits_r × P_r)
 
-adjusted_r = liquidity haircut(P_r)  // see below
+adjusted_r = liquidity haircut(P_r)
 grossAdjusted = round(Σ_r hits_r × adjusted_r)
 platformFees = round(grossAdjusted × platformFeeBps / 10_000)
 shipping = Σ_r round(hits_r) × shippingPerCardCents
@@ -35,41 +34,31 @@ marginBps = round((netEV − sealedPrice) / sealedPrice × 10_000)
 verdict = rip if marginBps ≥ ripMarginBps
         hold if marginBps ≥ holdMarginBps
         skip otherwise`}
-        </pre>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Liquidity haircut: if <em>P<sub>r</sub></em> is below{" "}
-          <code>liquidityThresholdCents</code>, we reduce the price by{" "}
-          <code>liquidityHaircutBps</code> basis points before EV. Default config lives in{" "}
-          <code>src/lib/engine/ev.ts</code> and is labeled sample until tuned against live fee
-          tables.
-        </p>
-      </section>
+      </pre>
+      <p>
+        If a card price is under the liquidity threshold, it is reduced by the haircut in basis
+        points before EV. Defaults live in the EV engine and stay labeled sample until they are
+        tuned against live fee tables.
+      </p>
 
-      <section className="mt-8">
-        <h2 className="text-xl font-semibold">Marketplace fees</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Versioned JSON schedules in <code>/data/fees</code> with <code>effectiveFrom</code> dates.
-          <code>netPayout()</code> selects the schedule in force on your chosen sale date and returns
-          an itemized breakdown per platform.
-        </p>
-      </section>
+      <h2>Marketplace fees</h2>
+      <p>
+        Versioned schedules in the fee data folder carry an effective date. Net payout uses the
+        rules in force on the sale date you pick and returns an itemized breakdown.
+      </p>
 
-      <section className="mt-8">
-        <h2 className="text-xl font-semibold">Grading ROI</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Expected graded value blends PSA 9 / PSA 10 comps with a self-reported condition mapping
-          (illustrative, not official gem rates). Compare expected graded net (after marketplace
-          fees) minus submission costs to selling raw.
-        </p>
-      </section>
+      <h2>Grading ROI</h2>
+      <p>
+        Expected graded value blends PSA 9 and PSA 10 comps with a self-reported condition mapping.
+        That mapping is illustrative. Compare expected graded net, after marketplace fees and
+        submission cost, with selling the card raw.
+      </p>
 
-      <section className="mt-8">
-        <h2 className="text-xl font-semibold">Data freshness</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Tables show upstream source and UTC capture time. Daily ingestion runs when{" "}
-          <code>CRON_SECRET</code> and API credentials are configured.
-        </p>
-      </section>
+      <h2>Data freshness</h2>
+      <p>
+        Tables show the upstream source and the UTC capture time. Daily ingestion runs when the
+        cron secret and API credentials are set.
+      </p>
     </div>
   );
 }

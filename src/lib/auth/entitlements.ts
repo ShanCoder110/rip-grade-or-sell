@@ -1,11 +1,14 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { hasPublicSupabaseConfig } from "@/env";
+import { readDemoSession } from "@/lib/auth/demo-session";
 import type { UserPlan } from "@/lib/auth/plan-limits";
 
 export type { UserPlan } from "@/lib/auth/plan-limits";
 
 export async function getUserPlan(): Promise<UserPlan> {
+  const demo = await readDemoSession();
+  if (demo?.plan === "pro") return "pro";
   if (!hasPublicSupabaseConfig()) return "free";
   try {
     const supabase = await createClient();

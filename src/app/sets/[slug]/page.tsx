@@ -14,7 +14,10 @@ import {
   latestCardPrices,
   latestProductPrice,
 } from "@/lib/engine/set-ev";
+import { AnimatedCents } from "@/components/animated-cents";
 import { EmailCapture } from "@/components/email-capture";
+import { EmptyState } from "@/components/empty-state";
+import { VerdictBadge } from "@/components/verdict-badge";
 import { formatCents } from "@/lib/utils";
 
 export const revalidate = 86400;
@@ -119,142 +122,168 @@ export default async function SetDetailPage({ params }: Props) {
   );
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <div className="page">
       <Breadcrumbs
-        items={[{ href: "/sets", label: "Sets" }, { href: `/sets/${slug}`, label: set.name }]}
+        items={[
+          { href: "/", label: "Home" },
+          { href: "/sets", label: "Sets" },
+          { href: `/sets/${slug}`, label: set.name },
+        ]}
       />
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{set.name}</h1>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="rise">
+          <h1 className="h1">{set.name}</h1>
           <PriceStamp source={latestSource} updatedAt={latestDate} />
         </div>
         {ev ? (
-          <div className="rounded-lg border border-border bg-card px-4 py-3 text-center">
-            <p className="text-xs uppercase text-muted-foreground">Verdict</p>
-            <p className="text-2xl font-bold capitalize">{ev.verdict}</p>
-            <p className="text-sm text-muted-foreground">
-              Net EV {formatCents(ev.net.netCents)} · Gross {formatCents(ev.gross)}
+          <div className="card rise delay-1 min-w-56 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Verdict
+            </p>
+            <div className="mt-2">
+              <VerdictBadge verdict={ev.verdict} />
+            </div>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Net <AnimatedCents cents={ev.net.netCents} className="font-semibold text-foreground" />
+              <span className="mx-1">·</span>
+              Gross <AnimatedCents cents={ev.gross} className="font-semibold text-foreground" />
             </p>
           </div>
         ) : null}
       </div>
 
       {set.is_prerelease ? (
-        <section className="mt-8 rounded-lg border border-dashed border-border p-6">
-          <h2 className="text-lg font-semibold">Pre-release template</h2>
+        <section className="card mt-8 border-dashed p-6">
+          <h2 className="h2">Pre-release template</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Official card list and measured pull rates will replace this section when data is
-            published. Expected rarities (unverified placeholders):
+            The official card list and measured pull rates replace this section when they are
+            published. Expected rarities below are unverified placeholders.
           </p>
-          <ul className="mt-3 list-disc pl-5 text-sm">
-            {prereleaseNotes.map((r) => (
-              <li key={r.rarity}>{r.rarity} — {r.note}</li>
-            ))}
-          </ul>
+          {prereleaseNotes.length ? (
+            <ul className="mt-4 grid gap-2 sm:grid-cols-3">
+              {prereleaseNotes.map((r) => (
+                <li key={r.rarity} className="rounded-xl bg-muted px-3 py-2 text-sm">
+                  <span className="font-medium">{r.rarity}</span>
+                  <span className="mt-1 block text-xs text-muted-foreground">{r.note}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="mt-4">
+              <EmptyState title="No expected rarities" body="The pre-release list has not been added yet." />
+            </div>
+          )}
         </section>
       ) : null}
 
       {set.pull_rates.length ? (
         <section className="mt-10">
-          <h2 className="text-xl font-semibold">Pull rates</h2>
-          <table className="mt-3 w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-left text-muted-foreground">
-                <th className="py-2">Rarity</th>
-                <th>Odds (1 in N packs)</th>
-                <th>Source</th>
-                <th>As of</th>
-              </tr>
-            </thead>
-            <tbody>
-              {set.pull_rates.map((r) => (
-                <tr key={r.rarity} className="border-b border-border/60">
-                  <td className="py-2">{r.rarity}</td>
-                  <td>{r.odds}</td>
-                  <td>
-                    <a href={r.source_url} className="text-primary underline" rel="noopener">
-                      link
-                    </a>
-                  </td>
-                  <td>{r.source_date}</td>
+          <h2 className="h2">Pull rates</h2>
+          <div className="table-wrap mt-3">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Rarity</th>
+                  <th>Odds</th>
+                  <th>Source</th>
+                  <th>As of</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {set.pull_rates.map((r) => (
+                  <tr key={r.rarity}>
+                    <td>{r.rarity}</td>
+                    <td>1 in {r.odds}</td>
+                    <td>
+                      <a href={r.source_url} className="link" rel="noopener noreferrer">
+                        {r.confidence}
+                      </a>
+                    </td>
+                    <td>{r.source_date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       ) : null}
 
       {chaseCards.length ? (
         <section className="mt-10">
-          <h2 className="text-xl font-semibold">Chase cards</h2>
-          <table className="mt-3 w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-left text-muted-foreground">
-                <th className="py-2">Card</th>
-                <th>Rarity</th>
-                <th>Price</th>
-                <th>Source</th>
-              </tr>
-            </thead>
-            <tbody>
-              {chaseCards.map(({ card, price, source }) => (
-                <tr key={card.id} className="border-b border-border/60">
-                  <td className="py-2">
-                    <Link
-                      href={`/sets/${slug}/cards/${card.id}/grade`}
-                      className="text-primary hover:underline"
-                    >
-                      {card.name}
-                    </Link>
-                  </td>
-                  <td>{card.rarity}</td>
-                  <td>{price != null ? formatCents(price) : "—"}</td>
-                  <td className="font-mono text-xs">{source}</td>
+          <h2 className="h2">Chase cards</h2>
+          <div className="table-wrap mt-3">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Card</th>
+                  <th>Rarity</th>
+                  <th>Price</th>
+                  <th>Source</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {chaseCards.map(({ card, price, source }) => (
+                  <tr key={card.id}>
+                    <td>
+                      <Link href={`/sets/${slug}/cards/${card.id}/grade`} className="link">
+                        {card.name}
+                      </Link>
+                    </td>
+                    <td>{card.rarity}</td>
+                    <td>{price != null ? formatCents(price) : "—"}</td>
+                    <td>
+                      <code className="text-xs">{source}</code>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
+      ) : !set.is_prerelease ? (
+        <div className="mt-10">
+          <EmptyState title="No chase cards" body="Cards show up here once the set checklist is loaded." />
+        </div>
       ) : null}
 
       {set.products.length ? (
         <section className="mt-10">
-          <h2 className="text-xl font-semibold">Products</h2>
-          <ul className="mt-3 space-y-2">
+          <h2 className="h2">Products</h2>
+          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
             {set.products.map((p) => (
               <li key={p.id}>
-                <Link href={`/sets/${slug}/${p.slug}-ev`} className="text-primary hover:underline">
-                  {p.name}
+                <Link href={`/sets/${slug}/${p.slug}-ev`} className="card block p-4 transition hover:-translate-y-0.5">
+                  <span className="font-medium">{p.name}</span>
+                  <span className="mt-1 block text-sm text-muted-foreground">
+                    MSRP {formatCents(p.msrp_cents)} · {p.pack_count} packs
+                  </span>
                 </Link>
-                <span className="ml-2 text-sm text-muted-foreground">
-                  MSRP {formatCents(p.msrp_cents)} · {p.pack_count} packs
-                </span>
               </li>
             ))}
           </ul>
         </section>
       ) : null}
 
-      {history.length ? (
-        <section className="mt-10">
-          <h2 className="text-xl font-semibold">EV history</h2>
-          {plan === "free" ? (
-            <p className="text-xs text-muted-foreground">Free plan: last {30} days shown.</p>
-          ) : null}
+      <section className="mt-10">
+        <h2 className="h2">EV history</h2>
+        {plan === "free" ? (
+          <p className="mt-1 text-xs text-muted-foreground">Free plan shows the last 30 days.</p>
+        ) : null}
+        <div className="mt-3">
           <EvHistoryChart data={history} />
-        </section>
-      ) : null}
+        </div>
+      </section>
 
-      <div className="mt-10 flex justify-between text-sm">
+      <div className="mt-10 flex flex-col gap-3 text-sm sm:flex-row sm:justify-between">
         {prev ? (
-          <Link href={`/sets/${prev.slug}`} className="text-primary hover:underline">
+          <Link href={`/sets/${prev.slug}`} className="btn btn-secondary">
             ← {prev.name}
           </Link>
         ) : (
           <span />
         )}
         {next ? (
-          <Link href={`/sets/${next.slug}`} className="text-primary hover:underline">
+          <Link href={`/sets/${next.slug}`} className="btn btn-secondary">
             {next.name} →
           </Link>
         ) : null}
@@ -263,11 +292,11 @@ export default async function SetDetailPage({ params }: Props) {
       <EmailCapture source={`set:${slug}`} />
 
       <p className="mt-8 text-sm">
-        <Link href="/tools/fee-calculator" className="text-primary hover:underline">
+        <Link href="/tools/fee-calculator" className="link">
           Compare marketplace fees
         </Link>
-        {" · "}
-        <Link href="/tools/grade-or-sell" className="text-primary hover:underline">
+        <span className="mx-2 text-muted-foreground">·</span>
+        <Link href="/tools/grade-or-sell" className="link">
           Grade or sell calculator
         </Link>
       </p>
