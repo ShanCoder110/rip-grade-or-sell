@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { EvHistoryChart, type EvHistoryPoint } from "@/components/ev-history-chart";
 import { PriceStamp } from "@/components/price-stamp";
-import { filterHistoryByPlan, getUserPlan } from "@/lib/auth/entitlements";
+import { getUserPlan } from "@/lib/auth/entitlements";
+import { filterHistoryByPlan } from "@/lib/auth/plan-limits";
 import { SEED_PRERELEASE_EXPECTED_RARITIES } from "@/lib/data/seed-fallback";
 import { getAdjacentSets } from "@/lib/data/set-navigation";
 import { getAllSetSlugs, getSetBySlug } from "@/lib/data/sets";
@@ -13,6 +14,7 @@ import {
   latestCardPrices,
   latestProductPrice,
 } from "@/lib/engine/set-ev";
+import { EmailCapture } from "@/components/email-capture";
 import { formatCents } from "@/lib/utils";
 
 export const revalidate = 86400;
@@ -257,6 +259,8 @@ export default async function SetDetailPage({ params }: Props) {
           </Link>
         ) : null}
       </div>
+
+      <EmailCapture source={`set:${slug}`} />
 
       <p className="mt-8 text-sm">
         <Link href="/tools/fee-calculator" className="text-primary hover:underline">
