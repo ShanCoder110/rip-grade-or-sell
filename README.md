@@ -6,7 +6,7 @@ TCG decision tools: sealed product EV, grade-or-sell ROI, marketplace fees, and 
 
 - Node.js 22+
 - npm 10+
-- [Supabase CLI](https://supabase.com/docs/guides/cli) and Docker (for local Postgres, Auth, and RLS tests)
+- [Supabase CLI](https://supabase.com/docs/guides/cli) and Docker (for local Postgres, Auth, and RLS tests). **This cloud agent environment did not have Docker** — migrations and scripts are still provided; run them on a machine with Docker Desktop or Linux Docker.
 
 ## Setup
 
