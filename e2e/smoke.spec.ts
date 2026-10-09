@@ -16,5 +16,5 @@ test("grade-or-sell calculator", async ({ page }) => {
 test("pricing page loads", async ({ page }) => {
   await page.goto("/pricing");
   await expect(page.getByRole("heading", { name: "Pricing" })).toBeVisible();
-  await expect(page.getByText("Pro")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pro" })).toBeVisible();
 });
