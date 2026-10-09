@@ -41,7 +41,7 @@ export function GradeOrSellCalculator({ className }: { className?: string }) {
     [raw, psa9, psa10, fee, ship, platform, condition],
   );
 
-  const shareUrl = useMemo(() => {
+  function buildShareUrl() {
     const q = new URLSearchParams({
       raw: String(raw),
       psa9: String(psa9),
@@ -52,7 +52,7 @@ export function GradeOrSellCalculator({ className }: { className?: string }) {
       condition,
     });
     return `${window.location.origin}/tools/grade-or-sell?${q}`;
-  }, [raw, psa9, psa10, fee, ship, platform, condition]);
+  }
 
   return (
     <div className={className}>
