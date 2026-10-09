@@ -1,8 +1,34 @@
-import { type NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
+const PROTECTED_PREFIXES = ["/app"];
+
 export async function middleware(request: NextRequest) {
-  return updateSession(request);
+  const response = await updateSession(request);
+  const path = request.nextUrl.pathname;
+  const isProtected = PROTECTED_PREFIXES.some((p) => path.startsWith(p));
+  if (!isProtected) return response;
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    return NextResponse.redirect(new URL("/auth/login", request.url));
+  }
+
+  const supabase = createServerClient(url, key, {
+    cookies: {
+      getAll: () => request.cookies.getAll(),
+      setAll: () => {},
+    },
+  });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.redirect(new URL("/auth/login", request.url));
+  }
+  return response;
 }
 
 export const config = {
