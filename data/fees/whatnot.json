@@ -1,0 +1,12 @@
+{
+  "platform": "whatnot",
+  "currency": "USD",
+  "effectiveFrom": "2024-01-01",
+  "sourceUrl": "https://help.whatnot.com/hc/en-us/articles/4412345678909",
+  "notes": "TODO: verify seller fee % from official Whatnot seller help",
+  "rules": {
+    "sellerFeeBps": 800,
+    "paymentProcessingBps": 290,
+    "paymentProcessingFixedCents": 30
+  }
+}

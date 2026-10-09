@@ -1,0 +1,11 @@
+{
+  "platform": "paypal",
+  "currency": "USD",
+  "effectiveFrom": "2024-01-01",
+  "sourceUrl": "https://www.paypal.com/us/webapps/mpp/merchant-fees",
+  "notes": "TODO: verify goods and services fee from PayPal merchant fees page",
+  "rules": {
+    "gnsFeeBps": 349,
+    "fixedFeeCents": 49
+  }
+}

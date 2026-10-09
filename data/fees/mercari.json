@@ -1,0 +1,12 @@
+{
+  "platform": "mercari",
+  "currency": "USD",
+  "effectiveFrom": "2024-01-01",
+  "sourceUrl": "https://www.mercari.com/us/help_center/article/187/",
+  "notes": "TODO: verify selling fee % from Mercari help center",
+  "rules": {
+    "sellingFeeBps": 1000,
+    "paymentProcessingBps": 290,
+    "paymentProcessingFixedCents": 50
+  }
+}

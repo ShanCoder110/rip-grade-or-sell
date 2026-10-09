@@ -1,0 +1,14 @@
+{
+  "platform": "ebay",
+  "currency": "USD",
+  "effectiveFrom": "2024-01-01",
+  "sourceUrl": "https://www.ebay.com/help/selling/fees-credits-invoices/selling-fees?id=4822",
+  "notes": "TODO: verify current final value fee % and per-order fees from sourceUrl",
+  "rules": {
+    "finalValueFeeBps": 1325,
+    "fixedFeeCents": 30,
+    "categoryOverrides": {
+      "tcg": { "finalValueFeeBps": 1325 }
+    }
+  }
+}

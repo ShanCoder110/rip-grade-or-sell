@@ -1,0 +1,12 @@
+{
+  "platform": "tcgplayer",
+  "currency": "USD",
+  "effectiveFrom": "2024-06-01",
+  "sourceUrl": "https://seller.tcgplayer.com/seller-fees",
+  "notes": "TODO: verify commission % and payment processing from sourceUrl",
+  "rules": {
+    "commissionBps": 1025,
+    "paymentProcessingBps": 290,
+    "paymentProcessingFixedCents": 30
+  }
+}
