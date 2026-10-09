@@ -105,8 +105,8 @@ export async function getSetBySlug(slug: string): Promise<SetDetail | null> {
       products.some((pr) => pr.id === p.product_id),
   );
 
-  if (!products.length || (!pull_rates.length && !set.is_prerelease)) {
-    if (!set.is_prerelease && !pull_rates.length) return null;
+  if (!set.is_prerelease && (!products.length || !pull_rates.length)) {
+    return null;
   }
 
   return {

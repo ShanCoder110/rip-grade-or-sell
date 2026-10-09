@@ -49,6 +49,12 @@ export const SEED_PRODUCTS = [
   },
 ];
 
+export const SEED_PRERELEASE_EXPECTED_RARITIES = [
+  { set_id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", rarity: "Common", note: "Official list pending" },
+  { set_id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", rarity: "Rare", note: "Official list pending" },
+  { set_id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", rarity: "Ultra Rare", note: "Official list pending" },
+];
+
 export const SEED_CARDS = [
   {
     id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
