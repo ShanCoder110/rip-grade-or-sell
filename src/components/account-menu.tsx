@@ -1,51 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-
-type Session = {
-  signedIn: boolean;
-  demo: boolean;
-  email: string | null;
-};
+import { signOutDemoSession, useClientSession } from "@/lib/hooks/use-client-session";
 
 export function AccountMenu() {
-  const [session, setSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/session")
-      .then((res) => res.json())
-      .then((data: Session) => {
-        if (!cancelled) setSession(data);
-      })
-      .catch(() => {
-        if (!cancelled) setSession({ signedIn: false, demo: false, email: null });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  async function signOut() {
-    await fetch("/api/auth/demo", { method: "DELETE" });
-    window.location.href = "/";
-  }
+  const session = useClientSession();
 
   if (!session?.signedIn) {
     return (
-      <Link href="/auth/login?next=/app/watchlist" className="btn btn-secondary">
+      <Link href="/auth/login?next=/app/watchlist" className="btn btn-secondary hidden shrink-0 sm:inline-flex">
         Sign in
       </Link>
     );
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <Link href="/app/watchlist" className="btn btn-secondary hidden sm:inline-flex">
+    <div className="hidden items-center gap-2 lg:flex">
+      <Link href="/app/watchlist" className="btn btn-secondary shrink-0">
         My lists
       </Link>
-      <button type="button" className="btn btn-secondary" onClick={signOut}>
+      <button type="button" className="btn btn-secondary shrink-0" onClick={() => void signOutDemoSession()}>
         Sign out
       </button>
     </div>

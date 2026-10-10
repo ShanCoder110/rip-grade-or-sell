@@ -10,10 +10,10 @@ const links = [
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="page">
-      <nav aria-label="Account" className="mb-8 flex flex-wrap gap-2">
+    <div className="page min-w-0 max-w-full overflow-x-clip">
+      <nav aria-label="Account" className="mb-8 flex w-full min-w-0 max-w-full flex-wrap gap-2">
         {links.map((item) => (
-          <Link key={item.href} href={item.href} className="btn btn-secondary">
+          <Link key={item.href} href={item.href} className="btn btn-secondary shrink-0">
             {item.label}
           </Link>
         ))}
