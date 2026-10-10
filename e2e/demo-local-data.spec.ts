@@ -2,16 +2,8 @@ import { test, expect } from "@playwright/test";
 import path from "node:path";
 import fs from "node:fs/promises";
 import os from "node:os";
-
-async function demoSignIn(page: import("@playwright/test").Page) {
-  const accept = page.getByRole("button", { name: "Accept all" });
-  if (await accept.isVisible().catch(() => false)) await accept.click();
-  await page.goto("/auth/login?next=/app/watchlist");
-  const demo = page.getByRole("button", { name: /demo account/i });
-  await expect(demo).toBeVisible();
-  await demo.click();
-  await page.waitForURL(/\/app\/watchlist/);
-}
+import { demoSignIn } from "./helpers/demo-sign-in";
+import { waitForPathname } from "./helpers/navigation";
 
 test("demo watchlist edit and remove", async ({ page }) => {
   await demoSignIn(page);
@@ -28,7 +20,7 @@ test("demo watchlist edit and remove", async ({ page }) => {
 test("demo portfolio import edit remove and clear all", async ({ page }) => {
   await demoSignIn(page);
   await page.getByRole("link", { name: "Portfolio" }).click();
-  await page.waitForURL(/\/app\/portfolio/);
+  await waitForPathname(page, "/app/portfolio");
 
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "rgs-csv-"));
   const csvPath1 = path.join(dir, "holdings-1.csv");
@@ -58,7 +50,7 @@ test("demo portfolio import edit remove and clear all", async ({ page }) => {
 test("demo alerts edit and remove", async ({ page }) => {
   await demoSignIn(page);
   await page.getByRole("link", { name: "Alerts" }).click();
-  await page.waitForURL(/\/app\/alerts/);
+  await waitForPathname(page, "/app/alerts");
   await page.getByPlaceholder("Raw under $25").fill("Price dip");
   await page.getByRole("button", { name: "Add rule" }).click();
   await expect(page.getByText(/Price dip/)).toBeVisible();

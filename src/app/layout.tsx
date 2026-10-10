@@ -45,7 +45,7 @@ export default function RootLayout({
           Skip to content
         </a>
         <SiteHeader />
-        <main id="main" className="flex-1">
+        <main id="main" className="flex-1 min-w-0 overflow-x-clip">
           {children}
         </main>
         <SiteFooter />

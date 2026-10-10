@@ -45,7 +45,7 @@ export function AccountMenu() {
       <Link href="/app/watchlist" className="btn btn-secondary hidden sm:inline-flex">
         My lists
       </Link>
-      <button type="button" className="btn btn-secondary" onClick={signOut}>
+      <button type="button" className="btn btn-secondary px-2.5 text-xs sm:px-4 sm:text-sm" onClick={signOut}>
         Sign out
       </button>
     </div>
