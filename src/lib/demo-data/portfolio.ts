@@ -11,6 +11,11 @@ export function listDemoPortfolio(demoId: string): DemoPortfolioRow[] {
   return readDemoCollection<DemoPortfolioRow[]>(demoId, COLLECTION, []);
 }
 
+function saveRows(demoId: string, rows: DemoPortfolioRow[]): DemoPortfolioRow[] {
+  writeDemoCollection(demoId, COLLECTION, rows);
+  return rows;
+}
+
 export function mergeDemoPortfolioImport(
   demoId: string,
   rows: DemoPortfolioRow[],
@@ -24,8 +29,41 @@ export function mergeDemoPortfolioImport(
     existing.set(row.cardId, prev + row.quantity);
   }
   const merged = [...existing.entries()].map(([cardId, quantity]) => ({ cardId, quantity }));
-  writeDemoCollection(demoId, COLLECTION, merged);
-  return { merged, imported };
+  return { merged: saveRows(demoId, merged), imported };
+}
+
+export function removeDemoPortfolioRow(demoId: string, cardId: string): DemoPortfolioRow[] {
+  return saveRows(
+    demoId,
+    listDemoPortfolio(demoId).filter((r) => r.cardId !== cardId),
+  );
+}
+
+export function updateDemoPortfolioRow(
+  demoId: string,
+  cardId: string,
+  patch: { cardId?: string; quantity?: number },
+): DemoPortfolioRow[] {
+  const rows = listDemoPortfolio(demoId);
+  const index = rows.findIndex((r) => r.cardId === cardId);
+  if (index < 0) return rows;
+
+  const nextCardId = patch.cardId?.trim() || cardId;
+  const nextQty = patch.quantity ?? rows[index]!.quantity;
+  if (!nextCardId || !Number.isFinite(nextQty) || nextQty <= 0) return rows;
+
+  const without = rows.filter((r) => r.cardId !== cardId);
+  if (without.some((r) => r.cardId === nextCardId && nextCardId !== cardId)) {
+    return rows;
+  }
+
+  const updated = [...without, { cardId: nextCardId, quantity: nextQty }];
+  updated.sort((a, b) => a.cardId.localeCompare(b.cardId));
+  return saveRows(demoId, updated);
+}
+
+export function clearDemoPortfolio(demoId: string): DemoPortfolioRow[] {
+  return saveRows(demoId, []);
 }
 
 export function parsePortfolioCsv(text: string): DemoPortfolioRow[] {

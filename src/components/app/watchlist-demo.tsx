@@ -7,6 +7,7 @@ import {
   addDemoWatchlistItem,
   listDemoWatchlist,
   removeDemoWatchlistItem,
+  updateDemoWatchlistItem,
   type DemoWatchlistItem,
 } from "@/lib/demo-data/watchlist";
 
@@ -17,6 +18,8 @@ const SAMPLE_CARD = {
 
 export function WatchlistDemo({ demoId }: { demoId: string }) {
   const [items, setItems] = useState<DemoWatchlistItem[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editLabel, setEditLabel] = useState("");
 
   const refresh = useCallback(() => {
     setItems(listDemoWatchlist(demoId));
@@ -25,6 +28,17 @@ export function WatchlistDemo({ demoId }: { demoId: string }) {
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  function startEdit(item: DemoWatchlistItem) {
+    setEditingId(item.id);
+    setEditLabel(item.label);
+  }
+
+  function saveEdit(id: string) {
+    if (!editLabel.trim()) return;
+    setItems(updateDemoWatchlistItem(demoId, id, { label: editLabel.trim() }));
+    setEditingId(null);
+  }
 
   return (
     <div>
@@ -50,15 +64,35 @@ export function WatchlistDemo({ demoId }: { demoId: string }) {
       ) : (
         <ul className="mt-6 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
           {items.map((item) => (
-            <li key={item.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-              <span>{item.label}</span>
-              <button
-                type="button"
-                className="link text-xs"
-                onClick={() => setItems(removeDemoWatchlistItem(demoId, item.id))}
-              >
-                Remove
-              </button>
+            <li key={item.id} className="flex flex-col gap-2 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+              {editingId === item.id ? (
+                <>
+                  <input
+                    className="flex-1 rounded-lg border border-border px-2 py-1"
+                    value={editLabel}
+                    onChange={(e) => setEditLabel(e.target.value)}
+                    aria-label="Watchlist label"
+                  />
+                  <div className="flex gap-3">
+                    <button type="button" className="link text-xs" onClick={() => saveEdit(item.id)}>Save</button>
+                    <button type="button" className="link text-xs" onClick={() => setEditingId(null)}>Cancel</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <span>{item.label}</span>
+                  <div className="flex gap-3 sm:ml-auto">
+                    <button type="button" className="link text-xs" onClick={() => startEdit(item)}>Edit</button>
+                    <button
+                      type="button"
+                      className="link text-xs"
+                      onClick={() => setItems(removeDemoWatchlistItem(demoId, item.id))}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </>
+              )}
             </li>
           ))}
         </ul>
