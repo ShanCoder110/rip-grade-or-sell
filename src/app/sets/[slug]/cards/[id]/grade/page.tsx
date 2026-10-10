@@ -6,7 +6,8 @@ import { GradeOrSellCalculator } from "@/components/tools/grade-or-sell-calculat
 import { generateSetCardGradeParams } from "@/lib/data/set-static-params";
 import { getSetBySlug } from "@/lib/data/sets";
 
-export const dynamicParams = false;
+export const revalidate = 86400;
+export const dynamicParams = true;
 
 type Props = { params: Promise<{ slug: string; id: string }> };
 
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, id } = await params;
   const set = await getSetBySlug(slug);
   const card = set?.cards.find((c) => c.id === id);
-  if (!card) return { title: "Grade card" };
+  if (!set || !card) notFound();
   return {
     title: `Grade or sell — ${card.name}`,
     alternates: { canonical: `/sets/${slug}/cards/${id}/grade` },
@@ -28,8 +29,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CardGradePage({ params }: Props) {
   const { slug, id } = await params;
   const set = await getSetBySlug(slug);
-  const card = set?.cards.find((c) => c.id === id);
-  if (!set || !card) notFound();
+  if (!set) notFound();
+  const card = set.cards.find((c) => c.id === id);
+  if (!card) notFound();
 
   return (
     <div className="page-narrow">

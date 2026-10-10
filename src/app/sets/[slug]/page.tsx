@@ -28,7 +28,7 @@ import { VerdictBadge } from "@/components/verdict-badge";
 import { formatCents } from "@/lib/utils";
 
 export const revalidate = 86400;
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -39,7 +39,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const set = await getSetBySlug(slug);
-  if (!set) return { title: "Set not found" };
+  if (!set) notFound();
   return {
     title: set.name,
     alternates: { canonical: `/sets/${slug}` },

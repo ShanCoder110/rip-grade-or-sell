@@ -1,12 +1,13 @@
+import { filterSlugsForStaticGeneration } from "@/lib/data/static-params-filter";
 import { getAllSetSlugs, getSetBySlug } from "@/lib/data/sets";
 
 export async function generateSetSlugParams() {
-  const slugs = await getAllSetSlugs();
+  const slugs = filterSlugsForStaticGeneration(await getAllSetSlugs());
   return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateSetProductParams() {
-  const slugs = await getAllSetSlugs();
+  const slugs = filterSlugsForStaticGeneration(await getAllSetSlugs());
   const params: { slug: string; product: string }[] = [];
   for (const slug of slugs) {
     const set = await getSetBySlug(slug);
@@ -19,7 +20,7 @@ export async function generateSetProductParams() {
 }
 
 export async function generateSetCardGradeParams() {
-  const slugs = await getAllSetSlugs();
+  const slugs = filterSlugsForStaticGeneration(await getAllSetSlugs());
   const params: { slug: string; id: string }[] = [];
   for (const slug of slugs) {
     const set = await getSetBySlug(slug);

@@ -44,3 +44,12 @@ test("unknown set and product URLs return HTTP 404", async ({ request }) => {
       .status(),
   ).toBe(404);
 });
+
+test("set omitted from generateStaticParams still renders on demand (ISR)", async ({
+  request,
+}) => {
+  const res = await request.get("/sets/delta-reign");
+  expect(res.status()).toBe(200);
+  const html = await res.text();
+  expect(html).toMatch(/Delta Reign/i);
+});

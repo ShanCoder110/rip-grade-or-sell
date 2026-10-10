@@ -11,7 +11,7 @@ import { computeProductEv, latestCardPrices, latestProductPrice } from "@/lib/en
 import { pullRateDisclaimer, resolvePullRatesForProduct } from "@/lib/engine/pull-rates";
 
 export const revalidate = 86400;
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 type Props = { params: Promise<{ slug: string; product: string }> };
 
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const productSlug = product.replace(/-ev$/, "");
   const set = await getSetBySlug(slug);
   const p = set?.products.find((x) => x.slug === productSlug);
-  if (!set || !p) return { title: "Product EV" };
+  if (!set || !p) notFound();
   return {
     title: `${p.name} EV — ${set.name}`,
     alternates: { canonical: `/sets/${slug}/${product}` },

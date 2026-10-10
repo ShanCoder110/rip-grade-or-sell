@@ -15,7 +15,9 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: process.env.CI ? "env RGS_DEMO_AUTH=1 npm run start" : "npm run dev",
+        command: process.env.CI
+          ? "env E2E_OMIT_STATIC_SET_SLUG=delta-reign npm run build && env RGS_DEMO_AUTH=1 npm run start"
+          : "npm run dev",
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         env: {
