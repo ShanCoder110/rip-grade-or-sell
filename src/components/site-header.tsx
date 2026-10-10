@@ -7,7 +7,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-md">
       <div className="relative mx-auto flex w-full min-w-0 max-w-6xl items-center gap-2 px-4 py-3 sm:gap-3">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
+        <Link href="/" className="flex min-w-0 shrink items-center gap-2 font-semibold tracking-tight">
           <span
             aria-hidden
             className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-[11px] font-bold text-primary-foreground"

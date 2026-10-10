@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { signOutDemoSession, useClientSession } from "@/lib/hooks/use-client-session";
 
 const links = [
   { href: "/sets", label: "Sets" },
@@ -29,12 +30,14 @@ export function DesktopNav() {
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
+  const session = useClientSession();
+  const signedIn = session?.signedIn === true;
 
   return (
     <div className="lg:hidden">
       <button
         type="button"
-        className="btn btn-secondary !px-3"
+        className="btn btn-secondary shrink-0 !px-3"
         aria-expanded={open}
         aria-controls="mobile-nav"
         onClick={() => setOpen((v) => !v)}
@@ -64,6 +67,41 @@ export function MobileNav() {
                 About
               </Link>
             </li>
+            {signedIn ? (
+              <>
+                <li className="mt-2 border-t border-border pt-2">
+                  <Link
+                    href="/app/watchlist"
+                    className="block rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted"
+                    onClick={() => setOpen(false)}
+                  >
+                    My lists
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-muted"
+                    onClick={() => {
+                      setOpen(false);
+                      void signOutDemoSession();
+                    }}
+                  >
+                    Sign out
+                  </button>
+                </li>
+              </>
+            ) : (
+              <li className="mt-2 border-t border-border pt-2 sm:hidden">
+                <Link
+                  href="/auth/login?next=/app/watchlist"
+                  className="block rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted"
+                  onClick={() => setOpen(false)}
+                >
+                  Sign in
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
       ) : null}
