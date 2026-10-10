@@ -1,6 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { DEMO_ID_COOKIE, isDemoAuthEnabled } from "@/lib/auth/demo-mode";
+import {
+  resolveSupabaseAnonKey,
+  resolveSupabaseUrl,
+} from "@/lib/supabase/config";
 import { updateSession } from "@/lib/supabase/middleware";
 
 const PROTECTED_PREFIXES = ["/app"];
@@ -15,8 +19,8 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url = resolveSupabaseUrl(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const key = resolveSupabaseAnonKey(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   const login = new URL("/auth/login", request.url);
   login.searchParams.set("next", path);
   if (!url || !key) {

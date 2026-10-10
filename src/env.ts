@@ -1,5 +1,11 @@
 import "server-only";
 import { z } from "zod";
+import {
+  isPublicSupabaseConfigured,
+  isSupabaseConfigured,
+  resolveSupabaseAnonKey,
+  resolveSupabaseUrl,
+} from "@/lib/supabase/config";
 
 const emptyToUndefined = (val: unknown) =>
   val === "" || val === undefined ? undefined : val;
@@ -40,13 +46,27 @@ function parseEnv(): Env {
 export const env = parseEnv();
 
 export function hasSupabaseConfig(): boolean {
-  return Boolean(
-    env.NEXT_PUBLIC_SUPABASE_URL &&
-      env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
-      env.SUPABASE_SERVICE_ROLE_KEY,
+  return isSupabaseConfigured(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    env.SUPABASE_SERVICE_ROLE_KEY,
   );
 }
 
 export function hasPublicSupabaseConfig(): boolean {
-  return Boolean(env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  return isPublicSupabaseConfigured(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  );
+}
+
+/** Resolved credentials (undefined when placeholders). For Supabase clients. */
+export function getPublicSupabaseCredentials(): {
+  url: string;
+  anonKey: string;
+} | null {
+  const url = resolveSupabaseUrl(env.NEXT_PUBLIC_SUPABASE_URL);
+  const anonKey = resolveSupabaseAnonKey(env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  if (!url || !anonKey) return null;
+  return { url, anonKey };
 }

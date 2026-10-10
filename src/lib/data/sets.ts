@@ -1,27 +1,10 @@
 import { hasPublicSupabaseConfig } from "@/env";
 import { createClient } from "@/lib/supabase/server";
-import {
-  SEED_CARDS,
-  SEED_PRICE_SNAPSHOTS,
-  SEED_PRODUCTS,
-  SEED_PULL_RATES,
-  SEED_SETS,
-} from "@/lib/data/seed-fallback";
+import { SEED_SETS } from "@/lib/data/seed-fallback";
+import { getSetDetailFromSeed, shouldFallbackToSeedData } from "@/lib/data/sets-seed";
+import type { SetDetail, SetSummary } from "@/lib/data/sets-types";
 
-export type SetSummary = {
-  id: string;
-  slug: string;
-  name: string;
-  release_date: string | null;
-  is_prerelease: boolean;
-};
-
-export type SetDetail = SetSummary & {
-  products: (typeof SEED_PRODUCTS)[number][];
-  cards: (typeof SEED_CARDS)[number][];
-  pull_rates: (typeof SEED_PULL_RATES)[number][];
-  price_snapshots: (typeof SEED_PRICE_SNAPSHOTS)[number][];
-};
+export type { SetDetail, SetSummary } from "@/lib/data/sets-types";
 
 async function fromSupabase(): Promise<SetSummary[] | null> {
   if (!hasPublicSupabaseConfig()) return null;
@@ -53,7 +36,10 @@ export async function getSetBySlug(slug: string): Promise<SetDetail | null> {
         .select("id, slug, name, release_date, is_prerelease")
         .eq("slug", slug)
         .maybeSingle();
-      if (!set) return null;
+      if (!set) {
+        if (shouldFallbackToSeedData()) return getSetDetailFromSeed(slug);
+        return null;
+      }
 
       const [products, cards, pull_rates, prices] = await Promise.all([
         supabase.from("products").select("*").eq("set_id", set.id),
@@ -80,7 +66,10 @@ export async function getSetBySlug(slug: string): Promise<SetDetail | null> {
         ...(productPrices.data ?? []),
       ] as SetDetail["price_snapshots"];
 
-      if (!products.data?.length || !pull_rates.data?.length) return null;
+      if (!products.data?.length || !pull_rates.data?.length) {
+        if (shouldFallbackToSeedData()) return getSetDetailFromSeed(slug);
+        return null;
+      }
 
       return {
         ...set,
@@ -90,32 +79,11 @@ export async function getSetBySlug(slug: string): Promise<SetDetail | null> {
         price_snapshots,
       };
     } catch {
-      // fall through to seed
+      if (shouldFallbackToSeedData()) return getSetDetailFromSeed(slug);
     }
   }
 
-  const set = SEED_SETS.find((s) => s.slug === slug);
-  if (!set) return null;
-  const products = SEED_PRODUCTS.filter((p) => p.set_id === set.id);
-  const cards = SEED_CARDS.filter((c) => c.set_id === set.id);
-  const pull_rates = SEED_PULL_RATES.filter((r) => r.set_id === set.id);
-  const price_snapshots = SEED_PRICE_SNAPSHOTS.filter(
-    (p) =>
-      cards.some((c) => c.id === p.card_id) ||
-      products.some((pr) => pr.id === p.product_id),
-  );
-
-  if (!set.is_prerelease && (!products.length || !pull_rates.length)) {
-    return null;
-  }
-
-  return {
-    ...set,
-    products,
-    cards,
-    pull_rates,
-    price_snapshots,
-  };
+  return getSetDetailFromSeed(slug);
 }
 
 export async function getAllSetSlugs(): Promise<string[]> {

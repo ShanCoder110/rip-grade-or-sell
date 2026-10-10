@@ -12,6 +12,7 @@ TCG decision tools: sealed product EV, grade-or-sell ROI, marketplace fees, and 
 
 ```bash
 cp .env.example .env.local
+# Leave Supabase vars empty in .env.local for demo mode (seed sets + demo sign-in).
 # Fill keys from `supabase start` output when running locally
 
 npm install
