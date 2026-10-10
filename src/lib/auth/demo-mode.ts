@@ -12,8 +12,14 @@ export function hasPublicSupabaseEnv(): boolean {
   );
 }
 
-/** Cookie sign-in used when Supabase is not configured (local dev / CI). */
+function isDemoAuthFlagEnabled(): boolean {
+  const flag = process.env.RGS_DEMO_AUTH?.trim().toLowerCase();
+  return flag === "1" || flag === "true" || flag === "yes";
+}
+
+/** Cookie sign-in used when Supabase is not configured (local dev / CI with RGS_DEMO_AUTH). */
 export function isDemoAuthEnabled(): boolean {
   if (hasPublicSupabaseEnv()) return false;
+  if (isDemoAuthFlagEnabled()) return true;
   return process.env.NODE_ENV !== "production";
 }

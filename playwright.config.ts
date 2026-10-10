@@ -15,8 +15,12 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: process.env.CI ? "npm run start" : "npm run dev",
+        command: process.env.CI ? "env RGS_DEMO_AUTH=1 npm run start" : "npm run dev",
         url: baseURL,
         reuseExistingServer: !process.env.CI,
+        env: {
+          ...process.env,
+          RGS_DEMO_AUTH: "1",
+        },
       },
 });

@@ -11,9 +11,7 @@ test("demo sign-in reaches watchlist", async ({ page }) => {
     test.skip(true, "Demo sign-in only when Supabase is not configured at build time");
   }
   await demo.click();
-  await page.waitForURL(/\/(app\/watchlist|auth\/login)/);
-  if (page.url().includes("/auth/login")) {
-    test.skip(true, "Runtime Supabase config requires real auth in this environment");
-  }
+  await page.waitForURL(/\/app\/watchlist/, { timeout: 15_000 });
   await expect(page.getByRole("heading", { name: "Watchlist" })).toBeVisible();
+  await expect(page.getByText(/saved in this browser only/i)).toBeVisible();
 });

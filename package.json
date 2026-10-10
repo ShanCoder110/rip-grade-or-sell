@@ -16,7 +16,8 @@
     "test:rls": "tsx scripts/test-rls.ts",
     "test:e2e": "playwright test",
     "build:cf": "opennextjs-cloudflare build",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "preview:cf": "node scripts/preview-cf.mjs",
+    "preview": "opennextjs-cloudflare build && node scripts/preview-cf.mjs",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "deploy:cron": "wrangler deploy -c workers/cron-dispatcher/wrangler.jsonc",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"

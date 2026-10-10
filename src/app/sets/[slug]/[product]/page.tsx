@@ -5,12 +5,19 @@ import { AnimatedCents } from "@/components/animated-cents";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { PriceStamp } from "@/components/price-stamp";
 import { VerdictBadge } from "@/components/verdict-badge";
+import { generateSetProductParams } from "@/lib/data/set-static-params";
 import { getSetBySlug } from "@/lib/data/sets";
 import { computeProductEv, latestCardPrices, latestProductPrice } from "@/lib/engine/set-ev";
+import { pullRateDisclaimer, resolvePullRatesForProduct } from "@/lib/engine/pull-rates";
 
 export const revalidate = 86400;
+export const dynamicParams = false;
 
 type Props = { params: Promise<{ slug: string; product: string }> };
+
+export async function generateStaticParams() {
+  return generateSetProductParams();
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, product } = await params;
@@ -30,11 +37,14 @@ export default async function ProductEvPage({ params }: Props) {
   const set = await getSetBySlug(slug);
   if (!set || set.is_prerelease) notFound();
   const p = set.products.find((x) => x.slug === productSlug);
-  if (!p || !set.pull_rates.length) notFound();
+  if (!p) notFound();
+
+  const resolved = resolvePullRatesForProduct(set.pull_rates, p.id, set.products);
+  if (!resolved?.rates.length) notFound();
 
   const pricesByRarity = latestCardPrices(set.price_snapshots, set.cards);
   const sealed = latestProductPrice(set.price_snapshots, p.id) ?? p.msrp_cents;
-  const ev = computeProductEv(set.pull_rates, pricesByRarity, p.pack_count, sealed);
+  const ev = computeProductEv(resolved.rates, pricesByRarity, p.pack_count, sealed);
   const latestDate =
     set.price_snapshots.reduce(
       (max, s) => (s.captured_on > max ? s.captured_on : max),
@@ -62,6 +72,13 @@ export default async function ProductEvPage({ params }: Props) {
         <VerdictBadge verdict={ev.verdict} />
       </div>
       <PriceStamp source={source} updatedAt={latestDate} />
+      <p className="mt-4 text-sm text-muted-foreground" role="note">
+        {pullRateDisclaimer(resolved, p.name)}{" "}
+        <a href={resolved.sourceUrl} className="link" rel="noopener noreferrer">
+          Source
+        </a>{" "}
+        ({resolved.sourceDate}).
+      </p>
       <dl className="mt-8 grid gap-3 sm:grid-cols-3">
         {stats.map((stat) => (
           <div key={stat.label} className="card p-4">

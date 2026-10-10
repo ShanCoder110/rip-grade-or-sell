@@ -8,7 +8,14 @@ import { AdSlot } from "@/components/ads/ad-slot";
 import { adSlots } from "@/lib/ads/slots";
 import { SEED_PRERELEASE_EXPECTED_RARITIES } from "@/lib/data/seed-fallback";
 import { getAdjacentSets } from "@/lib/data/set-navigation";
-import { getAllSetSlugs, getSetBySlug } from "@/lib/data/sets";
+import {
+  generateSetSlugParams,
+} from "@/lib/data/set-static-params";
+import { getSetBySlug } from "@/lib/data/sets";
+import {
+  pullRateDisclaimer,
+  resolvePullRatesForProduct,
+} from "@/lib/engine/pull-rates";
 import {
   computeProductEv,
   latestCardPrices,
@@ -21,12 +28,12 @@ import { VerdictBadge } from "@/components/verdict-badge";
 import { formatCents } from "@/lib/utils";
 
 export const revalidate = 86400;
+export const dynamicParams = false;
 
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
-  const slugs = await getAllSetSlugs();
-  return slugs.map((slug) => ({ slug }));
+  return generateSetSlugParams();
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -78,10 +85,15 @@ export default async function SetDetailPage({ params }: Props) {
       "1970-01-01",
     ) + "T12:00:00Z";
 
+  const primaryPullRates =
+    primaryProduct
+      ? resolvePullRatesForProduct(set.pull_rates, primaryProduct.id, set.products)
+      : null;
+
   const ev =
-    primaryProduct && set.pull_rates.length
+    primaryProduct && primaryPullRates?.rates.length
       ? computeProductEv(
-          set.pull_rates,
+          primaryPullRates.rates,
           pricesByRarity,
           primaryProduct.pack_count,
           latestProductPrice(set.price_snapshots, primaryProduct.id) ??
@@ -90,10 +102,10 @@ export default async function SetDetailPage({ params }: Props) {
       : null;
 
   const history =
-    primaryProduct && set.pull_rates.length
+    primaryProduct && primaryPullRates?.rates.length
       ? buildEvHistory(
           set.price_snapshots,
-          set.pull_rates,
+          primaryPullRates.rates,
           set.cards,
           primaryProduct.pack_count,
           latestProductPrice(set.price_snapshots, primaryProduct.id) ??
@@ -170,9 +182,14 @@ export default async function SetDetailPage({ params }: Props) {
       ) : null}
 
       {set.pull_rates.length ? (
-        <section className="mt-10">
+        <section className="mt-10 min-w-0">
           <h2 className="h2">Pull rates</h2>
-          <div className="table-wrap mt-3">
+          {primaryProduct && primaryPullRates?.scope === "fallback" ? (
+            <p className="mt-2 text-sm text-muted-foreground" role="note">
+              {pullRateDisclaimer(primaryPullRates, primaryProduct.name)}
+            </p>
+          ) : null}
+          <div className="table-wrap mt-3 max-w-full">
             <table className="data-table">
               <thead>
                 <tr>
@@ -202,9 +219,9 @@ export default async function SetDetailPage({ params }: Props) {
       ) : null}
 
       {chaseCards.length ? (
-        <section className="mt-10">
+        <section className="mt-10 min-w-0">
           <h2 className="h2">Chase cards</h2>
-          <div className="table-wrap mt-3">
+          <div className="table-wrap mt-3 max-w-full">
             <table className="data-table">
               <thead>
                 <tr>

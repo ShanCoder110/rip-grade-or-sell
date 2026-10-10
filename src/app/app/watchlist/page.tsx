@@ -1,19 +1,32 @@
 import { EmptyState } from "@/components/empty-state";
+import { AppSignInPrompt } from "@/components/app/sign-in-prompt";
+import { WatchlistDemo } from "@/components/app/watchlist-demo";
+import { getAppDataMode } from "@/lib/app-data-mode";
+import { readDemoSession } from "@/lib/auth/demo-session";
 import { createClient } from "@/lib/supabase/server";
-import { hasPublicSupabaseConfig } from "@/env";
 
 export default async function WatchlistPage() {
-  if (!hasPublicSupabaseConfig()) {
+  const mode = await getAppDataMode();
+  const demo = await readDemoSession();
+
+  if (mode === "none") {
     return (
       <div>
         <h1 className="h1">Watchlist</h1>
-        <EmptyState
-          title="Watchlist needs Supabase"
-          body="Connect Supabase to save cards to your account, or use the demo sign-in in local dev when Supabase is not configured."
-        />
+        <AppSignInPrompt nextPath="/app/watchlist" />
       </div>
     );
   }
+
+  if (mode === "demo" && demo) {
+    return (
+      <div>
+        <h1 className="h1">Watchlist</h1>
+        <WatchlistDemo demoId={demo.id} />
+      </div>
+    );
+  }
+
   const supabase = await createClient();
   const { data: items } = await supabase
     .from("watchlist_items")

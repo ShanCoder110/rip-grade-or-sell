@@ -35,3 +35,12 @@ test("legacy pricing URL redirects home", async ({ page }) => {
   await page.goto("/pricing");
   await expect(page).toHaveURL("/");
 });
+
+test("unknown set and product URLs return HTTP 404", async ({ request }) => {
+  expect((await request.get("/sets/not-a-real-set")).status()).toBe(404);
+  expect((await request.get("/sets/sample-stellar-crown/not-a-product-ev")).status()).toBe(404);
+  expect(
+    (await request.get("/sets/sample-stellar-crown/cards/00000000-0000-4000-8000-000000000000/grade"))
+      .status(),
+  ).toBe(404);
+});

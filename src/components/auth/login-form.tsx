@@ -97,8 +97,8 @@ export function LoginForm({ className, nextPath = "/app/watchlist" }: { classNam
       ) : null}
       {demoAvailable ? (
         <p className="mt-2 text-xs text-muted-foreground">
-          Demo account is local only when Supabase is not configured. It unlocks saved lists in this
-          browser without email.
+          Demo account stores watchlist, portfolio, and alerts in this browser (localStorage). Nothing
+          is sent to a server until you configure Supabase.
         </p>
       ) : null}
       {message ? (

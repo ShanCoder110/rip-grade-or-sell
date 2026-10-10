@@ -16,7 +16,7 @@ export default async function LoginPage({ searchParams }: Props) {
       <h1 className="h1">Sign in</h1>
       <p className="lede">
         Optional sign-in saves your watchlist, alerts, and portfolio. Magic link and Google need
-        Supabase. Without it, use the demo account in local dev.
+        Supabase. Without it, the demo account keeps those lists in this browser only.
       </p>
       <div className="card mt-8 p-5 sm:p-6">
         <LoginForm nextPath={nextPath} />

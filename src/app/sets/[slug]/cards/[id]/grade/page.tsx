@@ -3,9 +3,16 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { GradeOrSellCalculator } from "@/components/tools/grade-or-sell-calculator";
+import { generateSetCardGradeParams } from "@/lib/data/set-static-params";
 import { getSetBySlug } from "@/lib/data/sets";
 
+export const dynamicParams = false;
+
 type Props = { params: Promise<{ slug: string; id: string }> };
+
+export async function generateStaticParams() {
+  return generateSetCardGradeParams();
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, id } = await params;
