@@ -3,27 +3,33 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatedCents } from "@/components/animated-cents";
+import { MoneyInput } from "@/components/money-input";
 import { gradeOrSellAnalysis, type ConditionKey } from "@/lib/engine/grading";
 import type { Platform } from "@/lib/engine/fees";
+import {
+  centsParamToInitialInput,
+  centsToShareParam,
+  dollarInputToCents,
+  formatDollarsHint,
+} from "@/lib/money-input";
 
 const PLATFORMS: Platform[] = ["tcgplayer", "ebay", "whatnot", "mercari", "paypal"];
 
-function parseIntParam(v: string | null, fallback: number) {
-  const n = Number(v);
-  return Number.isFinite(n) && n >= 0 ? Math.round(n) : fallback;
-}
-
-function dollars(cents: number) {
-  return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
-}
+const DEFAULTS = {
+  raw: 2000,
+  psa9: 3500,
+  psa10: 8000,
+  fee: 2500,
+  ship: 500,
+} as const;
 
 export function GradeOrSellCalculator({ className }: { className?: string }) {
   const sp = useSearchParams();
-  const [raw, setRaw] = useState(parseIntParam(sp.get("raw"), 2000));
-  const [psa9, setPsa9] = useState(parseIntParam(sp.get("psa9"), 3500));
-  const [psa10, setPsa10] = useState(parseIntParam(sp.get("psa10"), 8000));
-  const [fee, setFee] = useState(parseIntParam(sp.get("fee"), 2500));
-  const [ship, setShip] = useState(parseIntParam(sp.get("ship"), 500));
+  const [rawInput, setRawInput] = useState(() => centsParamToInitialInput(sp.get("raw")));
+  const [psa9Input, setPsa9Input] = useState(() => centsParamToInitialInput(sp.get("psa9")));
+  const [psa10Input, setPsa10Input] = useState(() => centsParamToInitialInput(sp.get("psa10")));
+  const [feeInput, setFeeInput] = useState(() => centsParamToInitialInput(sp.get("fee")));
+  const [shipInput, setShipInput] = useState(() => centsParamToInitialInput(sp.get("ship")));
   const [platform, setPlatform] = useState<Platform>(
     (sp.get("platform") as Platform) || "tcgplayer",
   );
@@ -32,6 +38,12 @@ export function GradeOrSellCalculator({ className }: { className?: string }) {
   );
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState<string | null>(null);
+
+  const raw = dollarInputToCents(rawInput, DEFAULTS.raw);
+  const psa9 = dollarInputToCents(psa9Input, DEFAULTS.psa9);
+  const psa10 = dollarInputToCents(psa10Input, DEFAULTS.psa10);
+  const fee = dollarInputToCents(feeInput, DEFAULTS.fee);
+  const ship = dollarInputToCents(shipInput, DEFAULTS.ship);
 
   const analysis = useMemo(
     () =>
@@ -49,11 +61,11 @@ export function GradeOrSellCalculator({ className }: { className?: string }) {
 
   function buildShareUrl() {
     const q = new URLSearchParams({
-      raw: String(raw),
-      psa9: String(psa9),
-      psa10: String(psa10),
-      fee: String(fee),
-      ship: String(ship),
+      raw: centsToShareParam(raw),
+      psa9: centsToShareParam(psa9),
+      psa10: centsToShareParam(psa10),
+      fee: centsToShareParam(fee),
+      ship: centsToShareParam(ship),
       platform,
       condition,
     });
@@ -71,29 +83,73 @@ export function GradeOrSellCalculator({ className }: { className?: string }) {
     }
   }
 
+  const fields: {
+    id: string;
+    label: string;
+    placeholder: string;
+    value: string;
+    setValue: (v: string) => void;
+    defaultCents: number;
+  }[] = [
+    {
+      id: "raw-price",
+      label: "Raw price (USD)",
+      placeholder: "20",
+      value: rawInput,
+      setValue: setRawInput,
+      defaultCents: DEFAULTS.raw,
+    },
+    {
+      id: "psa9-price",
+      label: "PSA 9 price (USD)",
+      placeholder: "35",
+      value: psa9Input,
+      setValue: setPsa9Input,
+      defaultCents: DEFAULTS.psa9,
+    },
+    {
+      id: "psa10-price",
+      label: "PSA 10 price (USD)",
+      placeholder: "80",
+      value: psa10Input,
+      setValue: setPsa10Input,
+      defaultCents: DEFAULTS.psa10,
+    },
+    {
+      id: "grading-fee",
+      label: "Grading fee (USD)",
+      placeholder: "25",
+      value: feeInput,
+      setValue: setFeeInput,
+      defaultCents: DEFAULTS.fee,
+    },
+    {
+      id: "shipping",
+      label: "Shipping and insurance (USD)",
+      placeholder: "5",
+      value: shipInput,
+      setValue: setShipInput,
+      defaultCents: DEFAULTS.ship,
+    },
+  ];
+
   return (
     <div className={className}>
       <div className="grid gap-4 sm:grid-cols-2">
-        {(
-          [
-            ["Raw price (cents)", raw, setRaw],
-            ["PSA 9 price (cents)", psa9, setPsa9],
-            ["PSA 10 price (cents)", psa10, setPsa10],
-            ["Grading fee (cents)", fee, setFee],
-            ["Shipping and insurance (cents)", ship, setShip],
-          ] as const
-        ).map(([label, value, setter]) => (
-          <label key={label} className="field">
-            {label}
-            <input
-              type="number"
-              min={0}
-              inputMode="numeric"
-              value={value}
-              onChange={(e) => setter(Math.max(0, Number(e.target.value) || 0))}
-            />
-            <span className="hint">{dollars(value)} · stored as integer cents</span>
-          </label>
+        {fields.map((field) => (
+          <MoneyInput
+            key={field.id}
+            id={field.id}
+            label={field.label}
+            placeholder={field.placeholder}
+            value={field.value}
+            onChange={field.setValue}
+            hint={
+              field.value.trim() === ""
+                ? `Using ${formatDollarsHint(field.defaultCents)} until you enter a value`
+                : `Calculated as ${formatDollarsHint(dollarInputToCents(field.value, field.defaultCents))}`
+            }
+          />
         ))}
         <label className="field">
           Sale platform

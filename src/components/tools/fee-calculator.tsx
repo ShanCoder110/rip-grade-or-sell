@@ -2,11 +2,19 @@
 
 import { useMemo, useState } from "react";
 import { AnimatedCents } from "@/components/animated-cents";
+import { MoneyInput } from "@/components/money-input";
 import { rankPlatforms } from "@/lib/engine/fees";
+import { dollarInputToCents, formatDollarsHint } from "@/lib/money-input";
+
+const DEFAULT_PRICE_CENTS = 5000;
+const DEFAULT_SHIPPING_CENTS = 499;
 
 export function FeeCalculator() {
-  const [price, setPrice] = useState(5000);
-  const [shipping, setShipping] = useState(499);
+  const [priceInput, setPriceInput] = useState("");
+  const [shippingInput, setShippingInput] = useState("");
+
+  const price = dollarInputToCents(priceInput, DEFAULT_PRICE_CENTS);
+  const shipping = dollarInputToCents(shippingInput, DEFAULT_SHIPPING_CENTS);
 
   const ranked = useMemo(
     () => rankPlatforms({ priceCents: price, shippingCents: shipping }),
@@ -16,26 +24,30 @@ export function FeeCalculator() {
   return (
     <div>
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="field">
-          Sale price (cents)
-          <input
-            type="number"
-            min={0}
-            value={price}
-            onChange={(e) => setPrice(Math.max(0, Number(e.target.value) || 0))}
-          />
-          <span className="hint">Default $50.00. Change the cents to compare a different sale.</span>
-        </label>
-        <label className="field">
-          Shipping charged to buyer (cents)
-          <input
-            type="number"
-            min={0}
-            value={shipping}
-            onChange={(e) => setShipping(Math.max(0, Number(e.target.value) || 0))}
-          />
-          <span className="hint">Included in the fee base where the schedule says so.</span>
-        </label>
+        <MoneyInput
+          id="sale-price"
+          label="Sale price (USD)"
+          placeholder="50"
+          value={priceInput}
+          onChange={setPriceInput}
+          hint={
+            priceInput.trim() === ""
+              ? `Using ${formatDollarsHint(DEFAULT_PRICE_CENTS)} until you enter a value`
+              : `Calculated as ${formatDollarsHint(price)}`
+          }
+        />
+        <MoneyInput
+          id="buyer-shipping"
+          label="Shipping charged to buyer (USD)"
+          placeholder="4.99"
+          value={shippingInput}
+          onChange={setShippingInput}
+          hint={
+            shippingInput.trim() === ""
+              ? `Using ${formatDollarsHint(DEFAULT_SHIPPING_CENTS)} until you enter a value`
+              : `Calculated as ${formatDollarsHint(shipping)}`
+          }
+        />
       </div>
       <ol className="mt-8 space-y-3">
         {ranked.map((r, i) => (

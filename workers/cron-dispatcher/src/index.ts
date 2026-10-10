@@ -38,3 +38,5 @@ const cronDispatcher = {
     }
   },
 };
+
+export default cronDispatcher;

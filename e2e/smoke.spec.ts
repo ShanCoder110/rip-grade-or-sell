@@ -19,6 +19,7 @@ test("grade-or-sell calculator", async ({ page }) => {
   await dismissCookies(page);
   await page.goto("/tools/grade-or-sell");
   await expect(page.getByRole("heading", { name: /Grade or sell/i })).toBeVisible();
+  await page.locator("#raw-price").waitFor({ state: "visible", timeout: 15_000 });
   await expect(page.getByText(/Expected net vs selling raw/i)).toBeVisible();
 });
 
