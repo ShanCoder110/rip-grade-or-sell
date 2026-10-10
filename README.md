@@ -1,6 +1,6 @@
 # Rip, Grade or Sell
 
-TCG decision tools: sealed product EV, grade-or-sell ROI, marketplace fees, and pack simulation. Built with Next.js 15, Supabase, and typed ingestion adapters.
+TCG decision tools: sealed product EV, grade-or-sell ROI, marketplace fees, and pack simulation. Built with Next.js 15, Supabase, and typed ingestion adapters. The site is free for collectors and funded by optional Google AdSense ads (after cookie consent).
 
 ## Prerequisites
 
@@ -34,9 +34,13 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-### Demo Pro checkout
+### Demo sign-in
 
-If Stripe keys are unset and `NODE_ENV` is not `production`, sign-in offers a **demo account** (no Supabase required). From `/pricing`, monthly or yearly checkout unlocks Pro in an httpOnly cookie for that browser. No card is charged. Set `STRIPE_SECRET_KEY`, `STRIPE_PRICE_MONTHLY`, and `STRIPE_PRICE_YEARLY` to use Stripe Checkout in test mode instead. The webhook is `POST /api/billing/webhook`.
+When Supabase env vars are unset and `NODE_ENV` is not `production`, the login page offers a **demo account** cookie so you can open `/app/watchlist`, portfolio, and alerts without email auth.
+
+### AdSense
+
+Set `NEXT_PUBLIC_ADSENSE_CLIENT_ID` (`ca-pub-…`) and per-placement slot env vars. Ads load only after the user chooses **Accept all** on the cookie banner. Configure `ADSENSE_PUBLISHER_ID` so `/ads.txt` serves the correct `google.com, pub-…` line.
 
 ## Scripts
 
@@ -57,7 +61,7 @@ GitHub Actions runs lint, typecheck, test, and build on every push to `main`.
 
 ## Environment
 
-See `.env.example`. Optional keys (Resend, billing, Sentry, pokemontcg.io) degrade gracefully; local development uses seeded sample data when APIs are unavailable.
+See `.env.example`. Optional keys (Resend, AdSense, Sentry, pokemontcg.io) degrade gracefully; local development uses seeded sample data when APIs are unavailable.
 
 ## License
 

@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { EvHistoryChart, type EvHistoryPoint } from "@/components/ev-history-chart";
 import { PriceStamp } from "@/components/price-stamp";
-import { getUserPlan } from "@/lib/auth/entitlements";
-import { filterHistoryByPlan } from "@/lib/auth/plan-limits";
+import { AdSlot } from "@/components/ads/ad-slot";
+import { adSlots } from "@/lib/ads/slots";
 import { SEED_PRERELEASE_EXPECTED_RARITIES } from "@/lib/data/seed-fallback";
 import { getAdjacentSets } from "@/lib/data/set-navigation";
 import { getAllSetSlugs, getSetBySlug } from "@/lib/data/sets";
@@ -51,15 +51,10 @@ function buildEvHistory(
   cards: { id: string; rarity: string }[],
   packCount: number,
   sealedCents: number,
-  plan: Awaited<ReturnType<typeof getUserPlan>>,
 ): EvHistoryPoint[] {
   const dates = [...new Set(snapshots.map((s) => s.captured_on))].sort();
-  const filteredDates = filterHistoryByPlan(
-    dates.map((d) => ({ captured_on: d })),
-    plan,
-  ).map((d) => d.captured_on);
 
-  return filteredDates.map((date) => {
+  return dates.map((date) => {
     const daySnaps = snapshots.filter((s) => s.captured_on === date);
     const prices = latestCardPrices(daySnaps, cards);
     const ev = computeProductEv(pullRates, prices, packCount, sealedCents);
@@ -72,7 +67,6 @@ export default async function SetDetailPage({ params }: Props) {
   const set = await getSetBySlug(slug);
   if (!set) notFound();
 
-  const plan = await getUserPlan();
   const { prev, next } = await getAdjacentSets(slug);
   const primaryProduct = set.products[0];
   const pricesByRarity = latestCardPrices(set.price_snapshots, set.cards);
@@ -104,7 +98,6 @@ export default async function SetDetailPage({ params }: Props) {
           primaryProduct.pack_count,
           latestProductPrice(set.price_snapshots, primaryProduct.id) ??
             primaryProduct.msrp_cents,
-          plan,
         )
       : [];
 
@@ -266,12 +259,10 @@ export default async function SetDetailPage({ params }: Props) {
 
       <section className="mt-10">
         <h2 className="h2">EV history</h2>
-        {plan === "free" ? (
-          <p className="mt-1 text-xs text-muted-foreground">Free plan shows the last 30 days.</p>
-        ) : null}
         <div className="mt-3">
           <EvHistoryChart data={history} />
         </div>
+        <AdSlot slot={adSlots.setBelowChart} format="horizontal" className="mt-6" />
       </section>
 
       <div className="mt-10 flex flex-col gap-3 text-sm sm:flex-row sm:justify-between">

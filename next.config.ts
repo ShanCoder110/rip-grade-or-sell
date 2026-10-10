@@ -2,11 +2,12 @@ import type { NextConfig } from "next";
 
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://pagead2.googlesyndication.com https://www.googletagservices.com https://www.google.com https://www.gstatic.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
+  "img-src 'self' data: blob: https: https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google.com https://www.gstatic.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co http://127.0.0.1:54321 ws://127.0.0.1:54321",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co http://127.0.0.1:54321 ws://127.0.0.1:54321 https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google.com",
+  "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -14,6 +15,12 @@ const csp = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  async redirects() {
+    return [
+      { source: "/pricing", destination: "/", permanent: true },
+      { source: "/refund", destination: "/terms", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

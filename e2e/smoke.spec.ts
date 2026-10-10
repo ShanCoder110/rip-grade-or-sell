@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
-async function dismissCookies(page: import("@playwright/test").Page) {
-  const accept = page.getByRole("button", { name: "Accept" });
+async function dismissCookies(page: import("@playwright/test").Page, acceptAll = true) {
+  const accept = page.getByRole("button", { name: acceptAll ? "Accept all" : "Essential only" });
   if (await accept.isVisible().catch(() => false)) {
     await accept.click();
   }
@@ -22,9 +22,15 @@ test("grade-or-sell calculator", async ({ page }) => {
   await expect(page.getByText(/Expected net vs selling raw/i)).toBeVisible();
 });
 
-test("pricing page loads", async ({ page }) => {
+test("cookie consent banner", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("dialog", { name: "Cookie consent" })).toBeVisible();
+  await page.getByRole("button", { name: "Essential only" }).click();
+  await expect(page.getByRole("dialog", { name: "Cookie consent" })).toBeHidden();
+});
+
+test("legacy pricing URL redirects home", async ({ page }) => {
   await dismissCookies(page);
   await page.goto("/pricing");
-  await expect(page.getByRole("heading", { name: "Pricing" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Pro" })).toBeVisible();
+  await expect(page).toHaveURL("/");
 });

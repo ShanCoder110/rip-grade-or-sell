@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { AdSlot } from "@/components/ads/ad-slot";
 import { FeeCalculator } from "@/components/tools/fee-calculator";
+import { adSlots } from "@/lib/ads/slots";
 
 export const metadata: Metadata = {
   title: "Marketplace Fee Calculator",
@@ -19,6 +21,7 @@ export default function FeeCalculatorPage() {
       <div className="mt-8">
         <FeeCalculator />
       </div>
+      <AdSlot slot={adSlots.toolBelowResults} format="rectangle" className="mt-10" />
     </div>
   );
 }

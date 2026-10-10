@@ -13,7 +13,7 @@ Location: **`docs/LAUNCH_CHECKLIST.md`** (this file).
 ## Search & analytics
 
 - [ ] Google Search Console property + sitemap submit (`/sitemap.xml`).
-- [ ] Analytics (Plausible / GA4) with consent banner alignment.
+- [ ] Google AdSense approval, `ads.txt` via `ADSENSE_PUBLISHER_ID`, and cookie banner tested for UK/EEA.
 
 ## Affiliates
 
@@ -24,7 +24,6 @@ Location: **`docs/LAUNCH_CHECKLIST.md`** (this file).
 
 - [ ] Replace sample fee JSON with verified rates (URLs in `/data/fees`).
 - [ ] Verify pokemontcg.io / API terms for production traffic.
-- [ ] Stripe live keys + webhook endpoint + Customer Portal.
 - [ ] Resend domain verification for alert emails.
 
 ## Rollback

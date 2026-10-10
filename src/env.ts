@@ -4,6 +4,10 @@ import { z } from "zod";
 const emptyToUndefined = (val: unknown) =>
   val === "" || val === undefined ? undefined : val;
 
+const adsenseClientId = z
+  .string()
+  .regex(/^ca-pub-\d+$/, "NEXT_PUBLIC_ADSENSE_CLIENT_ID must look like ca-pub-1234567890123456");
+
 const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
@@ -16,17 +20,8 @@ const envSchema = z.object({
   RESEND_API_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
   RESEND_FROM_EMAIL: z.preprocess(emptyToUndefined, z.string().email().optional()),
   SENTRY_DSN: z.preprocess(emptyToUndefined, z.string().url().optional()),
-  BILLING_PROVIDER: z
-    .preprocess(
-      emptyToUndefined,
-      z.enum(["stripe", "lemon_squeezy", "paddle"]).optional(),
-    )
-    .optional(),
-  BILLING_WEBHOOK_SECRET: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
-  STRIPE_SECRET_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
-  STRIPE_PRICE_MONTHLY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
-  STRIPE_PRICE_YEARLY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
-  DEMO_CHECKOUT: z.preprocess(emptyToUndefined, z.enum(["true", "false"]).optional()),
+  NEXT_PUBLIC_ADSENSE_CLIENT_ID: z.preprocess(emptyToUndefined, adsenseClientId.optional()),
+  ADSENSE_PUBLISHER_ID: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
   POKEMONTCG_API_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
 });
 

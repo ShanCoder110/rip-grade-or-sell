@@ -25,7 +25,7 @@ const shots = [
   ["/tools/grade-or-sell", "screenshot-tools-grade-or-sell.png"],
   ["/tools/fee-calculator", "screenshot-tools-fee-calculator.png"],
   ["/tools/pack-simulator", "screenshot-tools-pack-simulator.png"],
-  ["/pricing", "screenshot-pricing.png"],
+  ["/privacy", "screenshot-privacy.png"],
 ];
 
 for (const [path, file] of shots) {

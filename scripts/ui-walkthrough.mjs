@@ -61,7 +61,7 @@ await go("/tools/pack-simulator");
 await page.getByRole("button", { name: /Open virtual pack/ }).click();
 await page.getByText("Last hit").waitFor({ timeout: 4000 });
 
-await go("/pricing");
+await go("/privacy");
 await page.getByRole("button", { name: "Subscribe monthly" }).click();
 await page.getByRole("status").waitFor({ timeout: 5000 });
 

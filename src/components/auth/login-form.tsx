@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { publicEnv } from "@/env.public";
 
-export function LoginForm({ className, nextPath = "/pricing" }: { className?: string; nextPath?: string }) {
+export function LoginForm({ className, nextPath = "/app/watchlist" }: { className?: string; nextPath?: string }) {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -97,7 +97,8 @@ export function LoginForm({ className, nextPath = "/pricing" }: { className?: st
       ) : null}
       {demoAvailable ? (
         <p className="mt-2 text-xs text-muted-foreground">
-          Demo account is local only. It lets you try checkout when Supabase is not running.
+          Demo account is local only when Supabase is not configured. It unlocks saved lists in this
+          browser without email.
         </p>
       ) : null}
       {message ? (

@@ -1,17 +1,6 @@
-import { ProGate } from "@/components/pro-gate";
 import { PortfolioCsvImport } from "@/components/portfolio-csv-import";
-import { requirePro } from "@/lib/auth/entitlements";
 
-export default async function PortfolioPage() {
-  const gate = await requirePro();
-  if (!gate.ok) {
-    return (
-      <div>
-        <h1 className="h1">Portfolio</h1>
-        <ProGate feature="Portfolio EV tracking" />
-      </div>
-    );
-  }
+export default function PortfolioPage() {
   return (
     <div>
       <h1 className="h1">Portfolio</h1>

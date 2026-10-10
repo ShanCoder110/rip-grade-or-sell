@@ -7,7 +7,6 @@ type Session = {
   signedIn: boolean;
   demo: boolean;
   email: string | null;
-  plan: "free" | "pro";
 };
 
 export function AccountMenu() {
@@ -21,7 +20,7 @@ export function AccountMenu() {
         if (!cancelled) setSession(data);
       })
       .catch(() => {
-        if (!cancelled) setSession({ signedIn: false, demo: false, email: null, plan: "free" });
+        if (!cancelled) setSession({ signedIn: false, demo: false, email: null });
       });
     return () => {
       cancelled = true;
@@ -35,7 +34,7 @@ export function AccountMenu() {
 
   if (!session?.signedIn) {
     return (
-      <Link href="/auth/login?next=/pricing" className="btn btn-secondary">
+      <Link href="/auth/login?next=/app/watchlist" className="btn btn-secondary">
         Sign in
       </Link>
     );
@@ -43,11 +42,9 @@ export function AccountMenu() {
 
   return (
     <div className="flex items-center gap-2">
-      {session.plan === "pro" ? (
-        <Link href="/app/portfolio" className="btn btn-secondary">
-          Pro
-        </Link>
-      ) : null}
+      <Link href="/app/watchlist" className="btn btn-secondary hidden sm:inline-flex">
+        My lists
+      </Link>
       <button type="button" className="btn btn-secondary" onClick={signOut}>
         Sign out
       </button>

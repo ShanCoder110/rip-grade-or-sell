@@ -8,7 +8,6 @@ const links = [
   { href: "/tools/grade-or-sell", label: "Grade or sell" },
   { href: "/tools/fee-calculator", label: "Fees" },
   { href: "/tools/pack-simulator", label: "Packs" },
-  { href: "/pricing", label: "Pricing" },
   { href: "/methodology", label: "Methodology" },
 ];
 
@@ -60,11 +59,6 @@ export function MobileNav() {
                 </Link>
               </li>
             ))}
-            <li>
-              <Link href="/pricing" className="block rounded-lg px-3 py-2 text-sm font-semibold hover:bg-muted" onClick={() => setOpen(false)}>
-                Go Pro
-              </Link>
-            </li>
             <li>
               <Link href="/about" className="block rounded-lg px-3 py-2 text-sm hover:bg-muted" onClick={() => setOpen(false)}>
                 About

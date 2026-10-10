@@ -9,7 +9,7 @@ const bodySchema = z.object({
 
 function safeNext(value: string | undefined): string {
   if (value && value.startsWith("/") && !value.startsWith("//")) return value;
-  return "/pricing";
+  return "/app/watchlist";
 }
 
 export async function POST(request: Request) {
@@ -21,7 +21,6 @@ export async function POST(request: Request) {
   await writeDemoSession({
     id: crypto.randomUUID(),
     email: "demo@local.test",
-    plan: "free",
   });
   return NextResponse.json({ ok: true, redirect: next });
 }
