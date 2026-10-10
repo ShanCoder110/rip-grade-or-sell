@@ -1,12 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  CONSENT_ALL,
+  CONSENT_ESSENTIAL,
+  readCookieConsent,
+  writeCookieConsent,
+} from "@/lib/ads/consent";
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!localStorage.getItem("cookie-consent")) setVisible(true);
+    if (!readCookieConsent()) setVisible(true);
   }, []);
 
   if (!visible) return null;
@@ -18,22 +24,36 @@ export function CookieConsent() {
       aria-label="Cookie consent"
     >
       <p className="text-sm leading-relaxed">
-        Essential cookies keep you signed in. Optional analytics stay off until you accept. See the{" "}
+        We use essential cookies to keep you signed in. With your permission we also load Google
+        AdSense, which may set advertising cookies (including in the UK/EEA under consent rules).
+        See our{" "}
         <a href="/privacy" className="link">
           privacy policy
         </a>
         .
       </p>
-      <button
-        type="button"
-        className="btn btn-primary mt-3"
-        onClick={() => {
-          localStorage.setItem("cookie-consent", "1");
-          setVisible(false);
-        }}
-      >
-        Accept
-      </button>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            writeCookieConsent(CONSENT_ALL);
+            setVisible(false);
+          }}
+        >
+          Accept all
+        </button>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => {
+            writeCookieConsent(CONSENT_ESSENTIAL);
+            setVisible(false);
+          }}
+        >
+          Essential only
+        </button>
+      </div>
     </div>
   );
 }

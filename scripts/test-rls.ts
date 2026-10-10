@@ -26,14 +26,14 @@ async function main() {
   }
   console.log("✓ anon blocked from ingest_runs");
 
-  const { error: entWriteErr } = await anonClient.from("entitlements").insert({
+  const { error: watchWriteErr } = await anonClient.from("watchlist_items").insert({
     user_id: "00000000-0000-4000-8000-000000000000",
-    plan: "pro",
+    card_id: "00000000-0000-4000-8000-000000000001",
   });
-  if (!entWriteErr) {
-    throw new Error("anon should not insert entitlements");
+  if (!watchWriteErr) {
+    throw new Error("anon should not insert watchlist_items");
   }
-  console.log("✓ anon blocked from writing entitlements");
+  console.log("✓ anon blocked from writing watchlist_items");
 
   const { data: svcSets } = await serviceClient.from("sets").select("count");
   if (!svcSets) throw new Error("service role should read sets");

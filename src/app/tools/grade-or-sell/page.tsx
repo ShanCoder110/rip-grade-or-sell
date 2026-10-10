@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { AdSlot } from "@/components/ads/ad-slot";
 import { GradeOrSellCalculator } from "@/components/tools/grade-or-sell-calculator";
+import { adSlots } from "@/lib/ads/slots";
 
 export const metadata: Metadata = {
   title: "Grade or Sell Calculator",
@@ -20,6 +22,7 @@ export default function GradeOrSellPage() {
       <Suspense fallback={<div className="skeleton mt-8 h-80 w-full" aria-busy="true" />}>
         <GradeOrSellCalculator className="mt-8" />
       </Suspense>
+      <AdSlot slot={adSlots.toolBelowResults} format="rectangle" className="mt-10" />
     </div>
   );
 }

@@ -10,13 +10,13 @@ type Props = { searchParams: Promise<{ next?: string }> };
 
 export default async function LoginPage({ searchParams }: Props) {
   const { next } = await searchParams;
-  const nextPath = next?.startsWith("/") && !next.startsWith("//") ? next : "/pricing";
+  const nextPath = next?.startsWith("/") && !next.startsWith("//") ? next : "/app/watchlist";
   return (
     <div className="page-narrow">
       <h1 className="h1">Sign in</h1>
       <p className="lede">
-        Sign in to subscribe to Pro. Magic link and Google need Supabase. Without it, use the demo
-        account to walk through checkout on this machine.
+        Optional sign-in saves your watchlist, alerts, and portfolio. Magic link and Google need
+        Supabase. Without it, the demo account keeps those lists in this browser only.
       </p>
       <div className="card mt-8 p-5 sm:p-6">
         <LoginForm nextPath={nextPath} />

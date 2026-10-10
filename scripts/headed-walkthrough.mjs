@@ -11,7 +11,7 @@ const base = "http://localhost:3000";
 
 async function go(path) {
   await page.goto(base + path, { waitUntil: "networkidle" });
-  const accept = page.getByRole("button", { name: "Accept" });
+  const accept = page.getByRole("button", { name: /Accept all/i });
   if (await accept.isVisible().catch(() => false)) await accept.click();
   await page.waitForTimeout(400);
 }
@@ -26,12 +26,10 @@ await go("/tools/pack-simulator");
 await page.getByRole("button", { name: /Open virtual pack/ }).click();
 await page.getByText("Last hit").waitFor();
 await page.waitForTimeout(500);
-await go("/pricing");
-await page.getByRole("link", { name: "Sign in to subscribe" }).click();
+await go("/auth/login?next=/app/watchlist");
 await page.getByRole("button", { name: "Continue with demo account" }).click();
-await page.waitForURL(/pricing/);
-await page.getByRole("button", { name: "Subscribe monthly" }).click();
-await page.getByText(/Pro is active/i).waitFor();
+await page.waitForURL(/\/app\/watchlist/);
+await page.getByText(/saved in this browser only/i).waitFor();
 await page.waitForTimeout(400);
 await go("/app/portfolio");
 await page.waitForTimeout(400);

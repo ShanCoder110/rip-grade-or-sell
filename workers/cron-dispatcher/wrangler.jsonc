@@ -1,0 +1,16 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "rip-grade-or-sell-cron",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-12-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "services": [
+    {
+      "binding": "APP",
+      "service": "rip-grade-or-sell",
+    },
+  ],
+  "triggers": {
+    "crons": ["0 6 * * *", "0 7 * * *"],
+  },
+}

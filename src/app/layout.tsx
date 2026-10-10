@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { AdSenseScript } from "@/components/ads/adsense-script";
 import { CookieConsent } from "@/components/cookie-consent";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -49,6 +50,7 @@ export default function RootLayout({
         </main>
         <SiteFooter />
         <CookieConsent />
+        <AdSenseScript />
       </body>
     </html>
   );

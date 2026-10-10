@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { requirePro } from "@/lib/auth/entitlements";
 import { createClient } from "@/lib/supabase/server";
 import { rateLimit } from "@/lib/server/rate-limit";
 
@@ -7,11 +6,6 @@ export async function POST(request: Request) {
   const limited = rateLimit(request, "portfolio-import", 10);
   if (!limited.ok) {
     return NextResponse.json({ error: "Rate limited" }, { status: 429 });
-  }
-
-  const gate = await requirePro();
-  if (!gate.ok) {
-    return NextResponse.json({ error: gate.reason }, { status: 403 });
   }
 
   const csv = await request.text();

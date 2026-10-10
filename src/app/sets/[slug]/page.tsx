@@ -4,11 +4,18 @@ import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { EvHistoryChart, type EvHistoryPoint } from "@/components/ev-history-chart";
 import { PriceStamp } from "@/components/price-stamp";
-import { getUserPlan } from "@/lib/auth/entitlements";
-import { filterHistoryByPlan } from "@/lib/auth/plan-limits";
+import { AdSlot } from "@/components/ads/ad-slot";
+import { adSlots } from "@/lib/ads/slots";
 import { SEED_PRERELEASE_EXPECTED_RARITIES } from "@/lib/data/seed-fallback";
 import { getAdjacentSets } from "@/lib/data/set-navigation";
-import { getAllSetSlugs, getSetBySlug } from "@/lib/data/sets";
+import {
+  generateSetSlugParams,
+} from "@/lib/data/set-static-params";
+import { getSetBySlug } from "@/lib/data/sets";
+import {
+  pullRateDisclaimer,
+  resolvePullRatesForProduct,
+} from "@/lib/engine/pull-rates";
 import {
   computeProductEv,
   latestCardPrices,
@@ -21,18 +28,18 @@ import { VerdictBadge } from "@/components/verdict-badge";
 import { formatCents } from "@/lib/utils";
 
 export const revalidate = 86400;
+export const dynamicParams = true;
 
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
-  const slugs = await getAllSetSlugs();
-  return slugs.map((slug) => ({ slug }));
+  return generateSetSlugParams();
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const set = await getSetBySlug(slug);
-  if (!set) return { title: "Set not found" };
+  if (!set) notFound();
   return {
     title: set.name,
     alternates: { canonical: `/sets/${slug}` },
@@ -51,15 +58,10 @@ function buildEvHistory(
   cards: { id: string; rarity: string }[],
   packCount: number,
   sealedCents: number,
-  plan: Awaited<ReturnType<typeof getUserPlan>>,
 ): EvHistoryPoint[] {
   const dates = [...new Set(snapshots.map((s) => s.captured_on))].sort();
-  const filteredDates = filterHistoryByPlan(
-    dates.map((d) => ({ captured_on: d })),
-    plan,
-  ).map((d) => d.captured_on);
 
-  return filteredDates.map((date) => {
+  return dates.map((date) => {
     const daySnaps = snapshots.filter((s) => s.captured_on === date);
     const prices = latestCardPrices(daySnaps, cards);
     const ev = computeProductEv(pullRates, prices, packCount, sealedCents);
@@ -72,7 +74,6 @@ export default async function SetDetailPage({ params }: Props) {
   const set = await getSetBySlug(slug);
   if (!set) notFound();
 
-  const plan = await getUserPlan();
   const { prev, next } = await getAdjacentSets(slug);
   const primaryProduct = set.products[0];
   const pricesByRarity = latestCardPrices(set.price_snapshots, set.cards);
@@ -84,10 +85,15 @@ export default async function SetDetailPage({ params }: Props) {
       "1970-01-01",
     ) + "T12:00:00Z";
 
+  const primaryPullRates =
+    primaryProduct
+      ? resolvePullRatesForProduct(set.pull_rates, primaryProduct.id, set.products)
+      : null;
+
   const ev =
-    primaryProduct && set.pull_rates.length
+    primaryProduct && primaryPullRates?.rates.length
       ? computeProductEv(
-          set.pull_rates,
+          primaryPullRates.rates,
           pricesByRarity,
           primaryProduct.pack_count,
           latestProductPrice(set.price_snapshots, primaryProduct.id) ??
@@ -96,15 +102,14 @@ export default async function SetDetailPage({ params }: Props) {
       : null;
 
   const history =
-    primaryProduct && set.pull_rates.length
+    primaryProduct && primaryPullRates?.rates.length
       ? buildEvHistory(
           set.price_snapshots,
-          set.pull_rates,
+          primaryPullRates.rates,
           set.cards,
           primaryProduct.pack_count,
           latestProductPrice(set.price_snapshots, primaryProduct.id) ??
             primaryProduct.msrp_cents,
-          plan,
         )
       : [];
 
@@ -177,9 +182,14 @@ export default async function SetDetailPage({ params }: Props) {
       ) : null}
 
       {set.pull_rates.length ? (
-        <section className="mt-10">
+        <section className="mt-10 min-w-0">
           <h2 className="h2">Pull rates</h2>
-          <div className="table-wrap mt-3">
+          {primaryProduct && primaryPullRates?.scope === "fallback" ? (
+            <p className="mt-2 text-sm text-muted-foreground" role="note">
+              {pullRateDisclaimer(primaryPullRates, primaryProduct.name)}
+            </p>
+          ) : null}
+          <div className="table-wrap mt-3 max-w-full">
             <table className="data-table">
               <thead>
                 <tr>
@@ -209,9 +219,9 @@ export default async function SetDetailPage({ params }: Props) {
       ) : null}
 
       {chaseCards.length ? (
-        <section className="mt-10">
+        <section className="mt-10 min-w-0">
           <h2 className="h2">Chase cards</h2>
-          <div className="table-wrap mt-3">
+          <div className="table-wrap mt-3 max-w-full">
             <table className="data-table">
               <thead>
                 <tr>
@@ -266,12 +276,10 @@ export default async function SetDetailPage({ params }: Props) {
 
       <section className="mt-10">
         <h2 className="h2">EV history</h2>
-        {plan === "free" ? (
-          <p className="mt-1 text-xs text-muted-foreground">Free plan shows the last 30 days.</p>
-        ) : null}
         <div className="mt-3">
           <EvHistoryChart data={history} />
         </div>
+        <AdSlot slot={adSlots.setBelowChart} format="horizontal" className="mt-6" />
       </section>
 
       <div className="mt-10 flex flex-col gap-3 text-sm sm:flex-row sm:justify-between">

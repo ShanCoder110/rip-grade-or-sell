@@ -19,9 +19,6 @@ export function SiteHeader() {
         </Link>
         <DesktopNav />
         <div className="ml-auto flex items-center gap-2">
-          <Link href="/pricing" className="btn btn-primary hidden sm:inline-flex">
-            Go Pro
-          </Link>
           <ThemeToggle />
           <AccountMenu />
           <MobileNav />

@@ -1,8 +1,18 @@
 import "server-only";
 import { z } from "zod";
+import {
+  isPublicSupabaseConfigured,
+  isSupabaseConfigured,
+  resolveSupabaseAnonKey,
+  resolveSupabaseUrl,
+} from "@/lib/supabase/config";
 
 const emptyToUndefined = (val: unknown) =>
   val === "" || val === undefined ? undefined : val;
+
+const adsenseClientId = z
+  .string()
+  .regex(/^ca-pub-\d+$/, "NEXT_PUBLIC_ADSENSE_CLIENT_ID must look like ca-pub-1234567890123456");
 
 const envSchema = z.object({
   NODE_ENV: z
@@ -16,17 +26,8 @@ const envSchema = z.object({
   RESEND_API_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
   RESEND_FROM_EMAIL: z.preprocess(emptyToUndefined, z.string().email().optional()),
   SENTRY_DSN: z.preprocess(emptyToUndefined, z.string().url().optional()),
-  BILLING_PROVIDER: z
-    .preprocess(
-      emptyToUndefined,
-      z.enum(["stripe", "lemon_squeezy", "paddle"]).optional(),
-    )
-    .optional(),
-  BILLING_WEBHOOK_SECRET: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
-  STRIPE_SECRET_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
-  STRIPE_PRICE_MONTHLY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
-  STRIPE_PRICE_YEARLY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
-  DEMO_CHECKOUT: z.preprocess(emptyToUndefined, z.enum(["true", "false"]).optional()),
+  NEXT_PUBLIC_ADSENSE_CLIENT_ID: z.preprocess(emptyToUndefined, adsenseClientId.optional()),
+  ADSENSE_PUBLISHER_ID: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
   POKEMONTCG_API_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
 });
 
@@ -45,13 +46,27 @@ function parseEnv(): Env {
 export const env = parseEnv();
 
 export function hasSupabaseConfig(): boolean {
-  return Boolean(
-    env.NEXT_PUBLIC_SUPABASE_URL &&
-      env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
-      env.SUPABASE_SERVICE_ROLE_KEY,
+  return isSupabaseConfigured(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    env.SUPABASE_SERVICE_ROLE_KEY,
   );
 }
 
 export function hasPublicSupabaseConfig(): boolean {
-  return Boolean(env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  return isPublicSupabaseConfigured(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  );
+}
+
+/** Resolved credentials (undefined when placeholders). For Supabase clients. */
+export function getPublicSupabaseCredentials(): {
+  url: string;
+  anonKey: string;
+} | null {
+  const url = resolveSupabaseUrl(env.NEXT_PUBLIC_SUPABASE_URL);
+  const anonKey = resolveSupabaseAnonKey(env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  if (!url || !anonKey) return null;
+  return { url, anonKey };
 }

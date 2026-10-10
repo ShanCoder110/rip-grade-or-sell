@@ -9,19 +9,24 @@ const bodySchema = z.object({
 
 function safeNext(value: string | undefined): string {
   if (value && value.startsWith("/") && !value.startsWith("//")) return value;
-  return "/pricing";
+  return "/app/watchlist";
 }
 
 export async function POST(request: Request) {
   if (!isDemoAuthEnabled()) {
-    return NextResponse.json({ error: "Demo sign-in is only available without Supabase in local dev." }, { status: 403 });
+    return NextResponse.json(
+      {
+        error:
+          "Demo sign-in is unavailable. Configure Supabase for real auth, use local dev, or set RGS_DEMO_AUTH=1 for test servers.",
+      },
+      { status: 403 },
+    );
   }
   const json = bodySchema.safeParse(await request.json().catch(() => ({})));
   const next = safeNext(json.success ? json.data.next : undefined);
   await writeDemoSession({
     id: crypto.randomUUID(),
     email: "demo@local.test",
-    plan: "free",
   });
   return NextResponse.json({ ok: true, redirect: next });
 }

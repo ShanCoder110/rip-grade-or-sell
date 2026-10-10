@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { AdSlot } from "@/components/ads/ad-slot";
 import { PackSimulator } from "@/components/tools/pack-simulator";
+import { adSlots } from "@/lib/ads/slots";
 
 export const metadata: Metadata = {
   title: "Pack Simulator",
@@ -15,6 +17,7 @@ export default function PackSimulatorPage() {
       <div className="mt-6">
         <PackSimulator />
       </div>
+      <AdSlot slot={adSlots.toolBelowResults} format="rectangle" className="mt-10" />
     </div>
   );
 }

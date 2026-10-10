@@ -6,7 +6,6 @@ const links = [
   { href: "/changelog", label: "Changelog" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
-  { href: "/refund", label: "Refund policy" },
   { href: "/affiliate-disclosure", label: "Affiliate disclosure" },
 ];
 

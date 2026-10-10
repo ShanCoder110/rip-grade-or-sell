@@ -1,8 +1,10 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { AdSlot } from "@/components/ads/ad-slot";
 import { AnimatedCents } from "@/components/animated-cents";
 import { PriceStamp } from "@/components/price-stamp";
 import { VerdictBadge } from "@/components/verdict-badge";
+import { adSlots } from "@/lib/ads/slots";
 import {
   SEED_CARDS,
   SEED_PRICE_SNAPSHOTS,
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
   title: "Home",
   alternates: { canonical: "/" },
   description:
-    "Free tool for trading card collectors. See whether to rip sealed product, grade a card, or sell it, with net profit after fees. Pro is $3/month or $24/year.",
+    "Free tool for trading card collectors. See whether to rip sealed product, grade a card, or sell it, with net profit after fees.",
 };
 
 const tools = [
@@ -64,14 +66,15 @@ export default function HomePage() {
         <p className="lede">
           Rip, Grade or Sell tells you whether opening sealed product, grading a card, or selling it
           raw leaves you ahead. The math uses published pull rates, recent prices, marketplace
-          fees, shipping, and grading costs. The three calculators are free.
+          fees, shipping, and grading costs. Every calculator, watchlist, alerts, and portfolio
+          feature is free. Sign in only when you want to save data to your account.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link href="/sets" className="btn btn-primary">
             Check a sealed product
           </Link>
-          <Link href="/pricing" className="btn btn-secondary">
-            Go Pro — $3/mo or $24/yr
+          <Link href="/tools/grade-or-sell" className="btn btn-secondary">
+            Grade or sell calculator
           </Link>
         </div>
       </section>
@@ -92,6 +95,8 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      <AdSlot slot={adSlots.homeBetweenTools} format="rectangle" className="mt-14" />
 
       <section className="mt-14" aria-labelledby="how-heading">
         <h2 id="how-heading" className="h2">
@@ -153,17 +158,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="card mt-14 p-6 sm:p-8" aria-labelledby="pro-heading">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">What we sell</p>
-        <h2 id="pro-heading" className="h2 mt-2">
-          Pro is $3 a month or $24 a year
+      <section className="card mt-14 p-6 sm:p-8" aria-labelledby="support-heading">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">How we fund the site</p>
+        <h2 id="support-heading" className="h2 mt-2">
+          Free for collectors, supported by ads
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          The set pages and calculators stay free. Pro adds an unlimited watchlist, price history
-          beyond 30 days, email alerts, and portfolio tools with CSV import. Cancel anytime.
+          There are no subscriptions or in-app purchases. We may show Google AdSense ads on some
+          pages after you accept optional cookies in the banner. Affiliate links on marketplace
+          comparisons are disclosed separately.
         </p>
-        <Link href="/pricing" className="btn btn-primary mt-5">
-          See Free vs Pro
+        <Link href="/privacy" className="btn btn-secondary mt-5">
+          Privacy &amp; cookies
         </Link>
       </section>
     </div>

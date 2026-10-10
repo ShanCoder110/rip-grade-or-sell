@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
-async function dismissCookies(page: import("@playwright/test").Page) {
-  const accept = page.getByRole("button", { name: "Accept" });
+async function dismissCookies(page: import("@playwright/test").Page, acceptAll = true) {
+  const accept = page.getByRole("button", { name: acceptAll ? "Accept all" : "Essential only" });
   if (await accept.isVisible().catch(() => false)) {
     await accept.click();
   }
@@ -19,12 +19,37 @@ test("grade-or-sell calculator", async ({ page }) => {
   await dismissCookies(page);
   await page.goto("/tools/grade-or-sell");
   await expect(page.getByRole("heading", { name: /Grade or sell/i })).toBeVisible();
+  await page.locator("#raw-price").waitFor({ state: "visible", timeout: 15_000 });
   await expect(page.getByText(/Expected net vs selling raw/i)).toBeVisible();
 });
 
-test("pricing page loads", async ({ page }) => {
+test("cookie consent banner", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("dialog", { name: "Cookie consent" })).toBeVisible();
+  await page.getByRole("button", { name: "Essential only" }).click();
+  await expect(page.getByRole("dialog", { name: "Cookie consent" })).toBeHidden();
+});
+
+test("legacy pricing URL redirects home", async ({ page }) => {
   await dismissCookies(page);
   await page.goto("/pricing");
-  await expect(page.getByRole("heading", { name: "Pricing" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Pro" })).toBeVisible();
+  await expect(page).toHaveURL("/");
+});
+
+test("unknown set and product URLs return HTTP 404", async ({ request }) => {
+  expect((await request.get("/sets/not-a-real-set")).status()).toBe(404);
+  expect((await request.get("/sets/sample-stellar-crown/not-a-product-ev")).status()).toBe(404);
+  expect(
+    (await request.get("/sets/sample-stellar-crown/cards/00000000-0000-4000-8000-000000000000/grade"))
+      .status(),
+  ).toBe(404);
+});
+
+test("set omitted from generateStaticParams still renders on demand (ISR)", async ({
+  request,
+}) => {
+  const res = await request.get("/sets/delta-reign");
+  expect(res.status()).toBe(200);
+  const html = await res.text();
+  expect(html).toMatch(/Delta Reign/i);
 });

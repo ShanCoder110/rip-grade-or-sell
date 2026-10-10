@@ -1,6 +1,6 @@
 # Rip, Grade or Sell
 
-TCG decision tools: sealed product EV, grade-or-sell ROI, marketplace fees, and pack simulation. Built with Next.js 15, Supabase, and typed ingestion adapters.
+TCG decision tools: sealed product EV, grade-or-sell ROI, marketplace fees, and pack simulation. Built with Next.js 15, Supabase, and typed ingestion adapters. The site is free for collectors and funded by optional Google AdSense ads (after cookie consent).
 
 ## Prerequisites
 
@@ -12,6 +12,7 @@ TCG decision tools: sealed product EV, grade-or-sell ROI, marketplace fees, and 
 
 ```bash
 cp .env.example .env.local
+# Leave Supabase vars empty in .env.local for demo mode (seed sets + demo sign-in).
 # Fill keys from `supabase start` output when running locally
 
 npm install
@@ -34,9 +35,13 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-### Demo Pro checkout
+### Demo sign-in
 
-If Stripe keys are unset and `NODE_ENV` is not `production`, sign-in offers a **demo account** (no Supabase required). From `/pricing`, monthly or yearly checkout unlocks Pro in an httpOnly cookie for that browser. No card is charged. Set `STRIPE_SECRET_KEY`, `STRIPE_PRICE_MONTHLY`, and `STRIPE_PRICE_YEARLY` to use Stripe Checkout in test mode instead. The webhook is `POST /api/billing/webhook`.
+When Supabase env vars are unset and `NODE_ENV` is not `production`, the login page offers a **demo account** cookie so you can open `/app/watchlist`, portfolio, and alerts without email auth.
+
+### AdSense
+
+Set `NEXT_PUBLIC_ADSENSE_CLIENT_ID` (`ca-pub-…`) and per-placement slot env vars. Ads load only after the user chooses **Accept all** on the cookie banner. Configure `ADSENSE_PUBLISHER_ID` so `/ads.txt` serves the correct `google.com, pub-…` line.
 
 ## Scripts
 
@@ -51,13 +56,22 @@ If Stripe keys are unset and `NODE_ENV` is not `production`, sign-in offers a **
 | `npm run db:types` | Generate Supabase types |
 | `npm run test:rls` | RLS policy script |
 
+## Deploy (Cloudflare Workers)
+
+Production hosting uses **OpenNext** on Cloudflare Workers (not Vercel). See **[docs/DEPLOY_CLOUDFLARE.md](docs/DEPLOY_CLOUDFLARE.md)** for R2 cache bindings, cron worker, secrets, and custom domain steps.
+
+```bash
+npm run preview   # Workers runtime locally (port 8787)
+npm run deploy    # Build + deploy to Cloudflare
+```
+
 ## CI
 
-GitHub Actions runs lint, typecheck, test, and build on every push to `main`.
+GitHub Actions runs lint, typecheck, test, `next build`, OpenNext `build:cf`, and Playwright on every push/PR. Pushes to `main` also deploy via `.github/workflows/deploy-cloudflare.yml` when Cloudflare secrets are configured.
 
 ## Environment
 
-See `.env.example`. Optional keys (Resend, billing, Sentry, pokemontcg.io) degrade gracefully; local development uses seeded sample data when APIs are unavailable.
+See `.env.example`. Optional keys (Resend, AdSense, Sentry, pokemontcg.io) degrade gracefully; local development uses seeded sample data when APIs are unavailable.
 
 ## License
 

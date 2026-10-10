@@ -169,50 +169,6 @@ export type Database = {
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
       };
-      subscriptions: {
-        Row: {
-          id: string;
-          user_id: string;
-          provider: string;
-          provider_subscription_id: string;
-          status: string;
-          plan_interval: string;
-          current_period_end: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          provider: string;
-          provider_subscription_id: string;
-          status: string;
-          plan_interval: string;
-          current_period_end?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["subscriptions"]["Insert"]>;
-      };
-      entitlements: {
-        Row: {
-          id: string;
-          user_id: string;
-          plan: "free" | "pro";
-          status: "active" | "canceled" | "past_due" | "trialing";
-          current_period_end: string | null;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          plan?: "free" | "pro";
-          status?: "active" | "canceled" | "past_due" | "trialing";
-          current_period_end?: string | null;
-          updated_at?: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["entitlements"]["Insert"]>;
-      };
       watchlist_items: {
         Row: {
           id: string;
@@ -317,8 +273,6 @@ export type Database = {
     Functions: Record<string, never>;
     Enums: {
       product_kind: "box" | "etb" | "bundle" | "pack";
-      entitlement_plan: "free" | "pro";
-      entitlement_status: "active" | "canceled" | "past_due" | "trialing";
     };
   };
 };
