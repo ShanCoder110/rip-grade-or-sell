@@ -6,8 +6,9 @@ Location: **`docs/LAUNCH_CHECKLIST.md`** (this file).
 
 - [ ] Create Supabase production project; apply migrations (`supabase db push` or CI job).
 - [ ] Enable daily backups in Supabase dashboard.
-- [ ] Configure Vercel project with env vars from `.env.example`.
-- [ ] Confirm `vercel.json` cron jobs authorized with `CRON_SECRET`.
+- [ ] Follow **[DEPLOY_CLOUDFLARE.md](./DEPLOY_CLOUDFLARE.md)**: R2 bucket, Workers deploy, secrets, custom domain.
+- [ ] GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`; variable `NEXT_PUBLIC_APP_URL`.
+- [ ] Deploy cron worker (`npm run deploy:cron`) and set `CRON_SECRET` on both workers.
 - [ ] Set up uptime monitoring (e.g. Better Stack) hitting `/api/health`.
 
 ## Search & analytics

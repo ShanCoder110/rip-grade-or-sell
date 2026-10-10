@@ -1,7 +1,5 @@
 import { ImageResponse } from "next/og";
 
-export const runtime = "edge";
-
 export default function OgImage() {
   return new ImageResponse(
     (

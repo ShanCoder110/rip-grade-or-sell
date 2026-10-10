@@ -55,9 +55,18 @@ Set `NEXT_PUBLIC_ADSENSE_CLIENT_ID` (`ca-pub-…`) and per-placement slot env va
 | `npm run db:types` | Generate Supabase types |
 | `npm run test:rls` | RLS policy script |
 
+## Deploy (Cloudflare Workers)
+
+Production hosting uses **OpenNext** on Cloudflare Workers (not Vercel). See **[docs/DEPLOY_CLOUDFLARE.md](docs/DEPLOY_CLOUDFLARE.md)** for R2 cache bindings, cron worker, secrets, and custom domain steps.
+
+```bash
+npm run preview   # Workers runtime locally (port 8787)
+npm run deploy    # Build + deploy to Cloudflare
+```
+
 ## CI
 
-GitHub Actions runs lint, typecheck, test, and build on every push to `main`.
+GitHub Actions runs lint, typecheck, test, `next build`, OpenNext `build:cf`, and Playwright on every push/PR. Pushes to `main` also deploy via `.github/workflows/deploy-cloudflare.yml` when Cloudflare secrets are configured.
 
 ## Environment
 
